@@ -8,49 +8,48 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark Space Theme - Lighter version */
-    --background: 240 10% 8%; /* Lighter deep space */
-    --foreground: 0 0% 95%; /* Bright white text */
+    /* Brand Colors */
+    --background: 210 40% 98%;
+    --foreground: 215 20% 15%;
 
-    --card: 240 10% 12%; /* Lighter card background */
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 20% 15%;
 
-    --popover: 240 10% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 20% 15%;
 
-    /* CARzy Space Theme Colors */
-    --primary: 260 100% 70%; /* Electric purple */
+    /* CARzy Brand Colors */
+    --primary: 180 80% 45%; /* Vibrant Teal */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 100% 80%;
+    --primary-glow: 180 85% 55%;
 
-    --secondary: 220 100% 60%; /* Deep space blue */
+    --secondary: 25 95% 53%; /* Vibrant Orange */
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 300 100% 75%; /* Bright magenta */
-    --accent-foreground: 240 10% 4%;
+    --accent: 220 100% 60%; /* Gradient Blue */
+    --accent-foreground: 0 0% 100%;
 
-    --muted: 240 5% 20%; /* Lighter dark gray */
-    --muted-foreground: 240 5% 70%;
+    --muted: 210 40% 95%;
+    --muted-foreground: 215 15% 55%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 10% 20%; /* Lighter border */
-    --input: 240 10% 20%;
-    --ring: 260 100% 70%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 180 80% 45%;
 
-    /* Custom Space Design Tokens */
+    /* Custom Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(220 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(25 100% 65%));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    --gradient-space: linear-gradient(135deg, hsl(240 10% 8%), hsl(240 20% 12%), hsl(260 30% 16%));
-    --gradient-card: linear-gradient(145deg, hsl(240 10% 10%), hsl(240 15% 12%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
     
-    /* Glowing Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(260 100% 70% / 0.2);
-    --shadow-medium: 0 8px 30px -8px hsl(260 100% 70% / 0.3);
-    --shadow-strong: 0 12px 40px -12px hsl(var(--primary) / 0.4);
-    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.4), 0 0 60px hsl(var(--accent) / 0.2);
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(220 13% 69% / 0.3);
+    --shadow-medium: 0 8px 30px -8px hsl(220 13% 69% / 0.4);
+    --shadow-strong: 0 12px 40px -12px hsl(var(--primary) / 0.3);
+    --shadow-glow: 0 0 30px hsl(var(--primary) / 0.2);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -76,34 +75,33 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Enhanced dark space theme - Lighter version */
-    --background: 240 10% 8%;
-    --foreground: 0 0% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 240 10% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 12%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 260 100% 75%;
-    --primary-foreground: 240 10% 3%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 220 100% 65%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 5% 18%;
-    --muted-foreground: 240 5% 75%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 300 100% 80%;
-    --accent-foreground: 240 10% 3%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 240 10% 18%;
-    --input: 240 10% 18%;
-    --ring: 260 100% 75%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -123,8 +121,6 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground font-poppins;
     scroll-behavior: smooth;
-    background: var(--gradient-space);
-    min-height: 100vh;
   }
 
   /* Custom utility classes */

@@ -125,13 +125,7 @@ const CarsShowcase = () => {
                   </div>
 
                   {/* CTA Button */}
-                  <Button 
-                    variant="default" 
-                    className="w-full"
-                    onClick={() => {
-                      alert(`Rental process started for ${car.name}! Price: ${car.price}/day`);
-                    }}
-                  >
+                  <Button variant="default" className="w-full">
                     Rent Now
                   </Button>
                 </div>
@@ -142,17 +136,7 @@ const CarsShowcase = () => {
 
         {/* View All Cars Button */}
         <div className="text-center mt-12">
-          <Button 
-            variant="outline" 
-            size="lg" 
-            className="px-8"
-            onClick={() => {
-              const carsSection = document.querySelector('#cars');
-              if (carsSection) {
-                carsSection.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-          >
+          <Button variant="outline" size="lg" className="px-8">
             View All Cars
           </Button>
         </div>
