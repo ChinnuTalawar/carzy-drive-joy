@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Car } from "lucide-react";
+import AuthModal from "./AuthModal";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authModal, setAuthModal] = useState<{
+    isOpen: boolean;
+    initialTab: "login" | "signup";
+  }>({ isOpen: false, initialTab: "login" });
 
   const navItems = [
     { name: "Home", href: "#home" },
@@ -39,10 +44,21 @@ const Header = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
-            <Button variant="default" size="lg">
-              Book Now
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-3">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
+            >
+              Login
+            </Button>
+            <Button 
+              variant="default" 
+              size="lg"
+              onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
+            >
+              Sign Up
             </Button>
           </div>
 
@@ -72,15 +88,32 @@ const Header = () => {
                   {item.name}
                 </a>
               ))}
-              <div className="px-3 py-2">
-                <Button variant="default" className="w-full">
-                  Book Now
+              <div className="px-3 py-2 space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
+                >
+                  Login
+                </Button>
+                <Button 
+                  variant="default" 
+                  className="w-full"
+                  onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
+                >
+                  Sign Up
                 </Button>
               </div>
             </div>
           </div>
         )}
       </nav>
+      
+      <AuthModal
+        isOpen={authModal.isOpen}
+        onClose={() => setAuthModal({ ...authModal, isOpen: false })}
+        initialTab={authModal.initialTab}
+      />
     </header>
   );
 };
