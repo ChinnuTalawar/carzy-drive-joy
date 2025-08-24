@@ -8,14 +8,14 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark Space Theme */
-    --background: 240 10% 4%; /* Deep space black */
+    /* Dark Space Theme - Lighter version */
+    --background: 240 10% 8%; /* Lighter deep space */
     --foreground: 0 0% 95%; /* Bright white text */
 
-    --card: 240 10% 6%; /* Slightly lighter black */
+    --card: 240 10% 12%; /* Lighter card background */
     --card-foreground: 0 0% 95%;
 
-    --popover: 240 10% 6%;
+    --popover: 240 10% 12%;
     --popover-foreground: 0 0% 95%;
 
     /* CARzy Space Theme Colors */
@@ -29,22 +29,22 @@ All colors MUST be HSL.
     --accent: 300 100% 75%; /* Bright magenta */
     --accent-foreground: 240 10% 4%;
 
-    --muted: 240 5% 15%; /* Dark gray */
-    --muted-foreground: 240 5% 65%;
+    --muted: 240 5% 20%; /* Lighter dark gray */
+    --muted-foreground: 240 5% 70%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 240 10% 15%; /* Dark border */
-    --input: 240 10% 15%;
+    --border: 240 10% 20%; /* Lighter border */
+    --input: 240 10% 20%;
     --ring: 260 100% 70%;
 
     /* Custom Space Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(220 100% 70%));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    --gradient-space: linear-gradient(135deg, hsl(240 10% 4%), hsl(240 20% 8%), hsl(260 30% 12%));
-    --gradient-card: linear-gradient(145deg, hsl(240 10% 6%), hsl(240 15% 8%));
+    --gradient-space: linear-gradient(135deg, hsl(240 10% 8%), hsl(240 20% 12%), hsl(260 30% 16%));
+    --gradient-card: linear-gradient(145deg, hsl(240 10% 10%), hsl(240 15% 12%));
     
     /* Glowing Shadows */
     --shadow-soft: 0 4px 20px -4px hsl(260 100% 70% / 0.2);
@@ -76,14 +76,14 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Enhanced dark space theme */
-    --background: 240 10% 3%;
+    /* Enhanced dark space theme - Lighter version */
+    --background: 240 10% 8%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 5%;
+    --card: 240 10% 12%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 5%;
+    --popover: 240 10% 12%;
     --popover-foreground: 0 0% 98%;
 
     --primary: 260 100% 75%;
@@ -92,8 +92,8 @@ All colors MUST be HSL.
     --secondary: 220 100% 65%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 240 5% 12%;
-    --muted-foreground: 240 5% 70%;
+    --muted: 240 5% 18%;
+    --muted-foreground: 240 5% 75%;
 
     --accent: 300 100% 80%;
     --accent-foreground: 240 10% 3%;
@@ -101,8 +101,8 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 10% 12%;
-    --input: 240 10% 12%;
+    --border: 240 10% 18%;
+    --input: 240 10% 18%;
     --ring: 260 100% 75%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;

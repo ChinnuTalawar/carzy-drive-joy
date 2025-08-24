@@ -17,6 +17,14 @@ const Header = () => {
     { name: "Contact", href: "#contact" },
   ];
 
+  const handleNavClick = (href: string) => {
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +34,7 @@ const Header = () => {
             <div className="gradient-primary p-2 rounded-xl shadow-soft">
               <Car className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
+            <span className="text-2xl font-extrabold gradient-primary bg-clip-text text-transparent tracking-wider">
               CARzy
             </span>
           </div>
@@ -34,13 +42,13 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => handleNavClick(item.href)}
                 className="text-foreground hover:text-primary transition-smooth font-medium"
               >
                 {item.name}
-              </a>
+              </button>
             ))}
           </div>
 
@@ -79,14 +87,13 @@ const Header = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 gradient-card rounded-xl mt-2 shadow-medium">
               {navItems.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="block px-3 py-2 text-foreground hover:text-primary transition-smooth font-medium"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => handleNavClick(item.href)}
+                  className="block w-full text-left px-3 py-2 text-foreground hover:text-primary transition-smooth font-medium"
                 >
                   {item.name}
-                </a>
+                </button>
               ))}
               <div className="px-3 py-2 space-y-2">
                 <Button 
