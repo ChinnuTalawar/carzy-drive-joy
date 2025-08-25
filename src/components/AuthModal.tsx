@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User, Shield, Car } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,6 +22,118 @@ interface AuthModalProps {
 
 const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) => {
   const [userType, setUserType] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    fullName: ""
+  });
+  const { toast } = useToast();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLogin = async () => {
+    if (!formData.email || !formData.password || !userType) {
+      toast({
+        title: "Error",
+        description: "Please fill all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (error) {
+        toast({
+          title: "Login Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Logged in successfully!"
+        });
+        onClose();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignup = async () => {
+    if (!formData.email || !formData.password || !formData.fullName || !userType) {
+      toast({
+        title: "Error",
+        description: "Please fill all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Don't allow admin signup
+    if (userType === "admin") {
+      toast({
+        title: "Error",
+        description: "Admin accounts cannot be created through signup",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: formData.fullName,
+            user_type: userType
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Signup Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Account created! Please check your email for verification."
+        });
+        onClose();
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getUserTypeIcon = (type: string) => {
     switch (type) {
@@ -58,6 +172,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   type="email"
                   placeholder="Enter your email"
                   className="gradient-card border-border"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -67,6 +183,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   type="password"
                   placeholder="Enter your password"
                   className="gradient-card border-border"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -97,9 +215,13 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full gradient-primary hover:shadow-glow hover:scale-105">
+              <Button 
+                className="w-full gradient-primary hover:shadow-glow hover:scale-105"
+                onClick={handleLogin}
+                disabled={loading}
+              >
                 {getUserTypeIcon(userType)}
-                Login
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </div>
           </TabsContent>
@@ -113,6 +235,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   type="text"
                   placeholder="Enter your full name"
                   className="gradient-card border-border"
+                  value={formData.fullName}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -122,6 +246,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   type="email"
                   placeholder="Enter your email"
                   className="gradient-card border-border"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -131,6 +257,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   type="password"
                   placeholder="Create a password"
                   className="gradient-card border-border"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -152,18 +280,16 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                         Car Owner
                       </div>
                     </SelectItem>
-                    <SelectItem value="admin">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        Admin
-                      </div>
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full gradient-primary hover:shadow-glow hover:scale-105">
+              <Button 
+                className="w-full gradient-primary hover:shadow-glow hover:scale-105"
+                onClick={handleSignup}
+                disabled={loading}
+              >
                 {getUserTypeIcon(userType)}
-                Sign Up
+                {loading ? "Creating Account..." : "Sign Up"}
               </Button>
             </div>
           </TabsContent>

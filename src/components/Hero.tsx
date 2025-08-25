@@ -17,6 +17,17 @@ const Hero = () => {
               </h1>
             </div>
 
+            {/* CTA Button */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground px-8 py-4 rounded-xl font-semibold text-lg hover:bg-primary/90 transition-smooth shadow-glow"
+                onClick={() => window.location.href = "/cars"}
+              >
+                Start Booking
+              </Button>
+            </div>
+
           </div>
 
           {/* Right Content - 3D Car Model */}

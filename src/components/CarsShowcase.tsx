@@ -147,10 +147,7 @@ const CarsShowcase = () => {
             size="lg" 
             className="px-8"
             onClick={() => {
-              const carsSection = document.querySelector('#cars');
-              if (carsSection) {
-                carsSection.scrollIntoView({ behavior: 'smooth' });
-              }
+              window.location.href = "/cars";
             }}
           >
             View All Cars
