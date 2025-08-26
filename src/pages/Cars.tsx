@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, Fuel, Settings, Calendar, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import Header from "@/components/Header";
 import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
 import carSuvImage from "@/assets/car-suv.jpg";
@@ -12,8 +14,31 @@ import carSportsImage from "@/assets/car-sports.jpg";
 const Cars = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const cars = [
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("cars")
+          .select("*")
+          .eq("available", true);
+        
+        if (data && !error) {
+          setCars(data);
+        }
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
+
+  const staticCars = [
     {
       id: 1,
       name: "Compact Hatchback",
@@ -144,58 +169,44 @@ const Cars = () => {
 
   const categories = ["all", "Economy", "Luxury", "SUV", "Sports", "Electric", "Crossover"];
 
+  const allCars = cars.length > 0 ? cars : staticCars;
   const filteredCars = selectedCategory === "all" 
-    ? cars 
-    : cars.filter(car => car.category === selectedCategory);
+    ? allCars 
+    : allCars.filter(car => car.category === selectedCategory);
 
   const handleRentNow = (car: any) => {
-    alert(`Booking process started for ${car.name}!\nPrice: ${car.price}/day\nLocation: ${car.location}\nAvailability: ${car.availability}`);
+    navigate(`/car/${car.id}`);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => navigate("/")}
-                className="hover:bg-primary/10"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
-                Our Fleet
-              </h1>
+    <div className="min-h-screen">
+      <Header />
+      <main className="pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
+            Our Fleet
+          </h1>
+
+          {/* Category Filter */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold mb-4">Filter by Category</h2>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category)}
+                  className="capitalize gradient-card border-border"
+                >
+                  {category === "all" ? "All Cars" : category}
+                </Button>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Category Filter */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold mb-4">Filter by Category</h2>
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className="capitalize"
-              >
-                {category === "all" ? "All Cars" : category}
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Cars Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Cars Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCars.map((car) => (
             <Card 
               key={car.id} 
@@ -234,10 +245,10 @@ const Cars = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-semibold">{car.name}</h3>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">{car.price}</div>
-                      <div className="text-xs text-muted-foreground">per day</div>
-                    </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">₹{car.price_per_day || car.price}</div>
+                        <div className="text-xs text-muted-foreground">per day</div>
+                      </div>
                   </div>
 
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
@@ -252,7 +263,7 @@ const Cars = () => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Fuel className="h-3 w-3" />
-                      <span>{car.fuel}</span>
+                      <span>{car.fuel_type || car.fuel}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Settings className="h-3 w-3" />
@@ -268,68 +279,73 @@ const Cars = () => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-3 w-3" />
-                      <span>{car.specifications.year}</span>
+                      <span>{car.year || car.specifications?.year}</span>
                     </div>
                   </div>
 
                   {/* Key Features */}
-                  <div className="mb-4">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">Key Features:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {car.features.slice(0, 3).map((feature, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          {feature}
-                        </Badge>
-                      ))}
-                      {car.features.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{car.features.length - 3} more
-                        </Badge>
-                      )}
+                  {car.features && (
+                    <div className="mb-4">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Key Features:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {car.features.slice(0, 3).map((feature, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {feature}
+                          </Badge>
+                        ))}
+                        {car.features.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{car.features.length - 3} more
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Specifications */}
-                  <div className="mb-6">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">Specifications:</p>
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      <div className="flex justify-between">
-                        <span>Engine:</span>
-                        <span>{car.specifications.engine}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Mileage:</span>
-                        <span>{car.specifications.mileage}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Color:</span>
-                        <span>{car.specifications.color}</span>
+                  {car.specifications && (
+                    <div className="mb-6">
+                      <p className="text-xs font-medium text-muted-foreground mb-2">Specifications:</p>
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <div className="flex justify-between">
+                          <span>Engine:</span>
+                          <span>{car.specifications.engine}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Mileage:</span>
+                          <span>{car.specifications.mileage}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Color:</span>
+                          <span>{car.specifications.color}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* CTA Button */}
                   <Button 
                     variant="default" 
-                    className="w-full"
+                    className="w-full gradient-primary hover:shadow-glow hover:scale-105"
                     onClick={() => handleRentNow(car)}
-                    disabled={car.availability !== "Available"}
+                    disabled={!car.available && car.availability !== "Available"}
                   >
                     <Clock className="h-4 w-4 mr-2" />
-                    {car.availability === "Available" ? "Book Now" : "Not Available"}
+                    {(car.available !== false && car.availability !== "Limited") ? "Book Now" : "Not Available"}
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        {filteredCars.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No cars found in this category.</p>
           </div>
-        )}
-      </div>
+
+          {filteredCars.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No cars found in this category.</p>
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

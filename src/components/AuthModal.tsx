@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Shield, Car } from "lucide-react";
+import { User, Shield, Car, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -23,6 +23,7 @@ interface AuthModalProps {
 const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) => {
   const [userType, setUserType] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -178,14 +179,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="login-password">Password</Label>
-                <Input
-                  id="login-password"
-                  type="password"
-                  placeholder="Enter your password"
-                  className="gradient-card border-border"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    className="gradient-card border-border pr-12"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="login-type">Login as</Label>
@@ -252,14 +264,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-password">Password</Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  placeholder="Create a password"
-                  className="gradient-card border-border"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange("password", e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a password"
+                    className="gradient-card border-border pr-12"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-type">Sign up as</Label>

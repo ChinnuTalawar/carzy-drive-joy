@@ -1,14 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Car } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import AuthModal from "./AuthModal";
+import UserMenu from "./UserMenu";
+import SearchModal from "./SearchModal";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [authModal, setAuthModal] = useState<{
     isOpen: boolean;
     initialTab: "login" | "signup";
   }>({ isOpen: false, initialTab: "login" });
+  const [searchModal, setSearchModal] = useState(false);
+
+  // Authentication state management
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navItems = [
     { name: "Home", href: "#home" },
@@ -56,22 +81,28 @@ const Header = () => {
             ))}
           </div>
 
-          {/* Auth Buttons */}
+          {/* Auth Buttons or User Menu */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
-            >
-              Login
-            </Button>
-            <Button 
-              variant="default" 
-              size="lg"
-              onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
-            >
-              Sign Up
-            </Button>
+            {user ? (
+              <UserMenu user={user} onSearch={() => setSearchModal(true)} />
+            ) : (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
+                >
+                  Login
+                </Button>
+                <Button 
+                  variant="default" 
+                  size="lg"
+                  onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -100,20 +131,28 @@ const Header = () => {
                 </button>
               ))}
               <div className="px-3 py-2 space-y-2">
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
-                >
-                  Login
-                </Button>
-                <Button 
-                  variant="default" 
-                  className="w-full"
-                  onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
-                >
-                  Sign Up
-                </Button>
+                {user ? (
+                  <div className="flex flex-col space-y-2">
+                    <UserMenu user={user} onSearch={() => setSearchModal(true)} />
+                  </div>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setAuthModal({ isOpen: true, initialTab: "login" })}
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      variant="default" 
+                      className="w-full"
+                      onClick={() => setAuthModal({ isOpen: true, initialTab: "signup" })}
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -124,6 +163,11 @@ const Header = () => {
         isOpen={authModal.isOpen}
         onClose={() => setAuthModal({ ...authModal, isOpen: false })}
         initialTab={authModal.initialTab}
+      />
+      
+      <SearchModal
+        isOpen={searchModal}
+        onClose={() => setSearchModal(false)}
       />
     </header>
   );

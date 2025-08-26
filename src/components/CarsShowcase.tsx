@@ -1,13 +1,42 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Users, Fuel, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
 import carSuvImage from "@/assets/car-suv.jpg";
 import carSportsImage from "@/assets/car-sports.jpg";
 
 const CarsShowcase = () => {
-  const cars = [
+  const navigate = useNavigate();
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("cars")
+          .select("*")
+          .eq("available", true)
+          .limit(4);
+        
+        if (data && !error) {
+          setCars(data);
+        }
+      } catch (error) {
+        console.error("Error fetching cars:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
+
+  const staticCars = [
     {
       id: 1,
       name: "Compact Hatchback",
@@ -72,7 +101,7 @@ const CarsShowcase = () => {
 
         {/* Cars Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cars.map((car) => (
+          {(cars.length > 0 ? cars : staticCars).map((car) => (
             <Card 
               key={car.id} 
               className="group hover:shadow-strong transition-smooth hover:-translate-y-2 border-0 shadow-soft gradient-card overflow-hidden"
@@ -103,7 +132,7 @@ const CarsShowcase = () => {
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-semibold">{car.name}</h3>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">{car.price}</div>
+                      <div className="text-2xl font-bold text-primary">₹{car.price_per_day || car.price}</div>
                       <div className="text-xs text-muted-foreground">per day</div>
                     </div>
                   </div>
@@ -128,9 +157,7 @@ const CarsShowcase = () => {
                   <Button 
                     variant="default" 
                     className="w-full"
-                    onClick={() => {
-                      alert(`Rental process started for ${car.name}! Price: ${car.price}/day`);
-                    }}
+                    onClick={() => navigate(`/car/${car.id}`)}
                   >
                     Rent Now
                   </Button>

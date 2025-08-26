@@ -14,6 +14,128 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          car_id: string
+          created_at: string
+          end_date: string
+          id: string
+          start_date: string
+          status: string | null
+          total_amount: number
+          updated_at: string
+          user_details: Json | null
+          user_id: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          end_date: string
+          id?: string
+          start_date: string
+          status?: string | null
+          total_amount: number
+          updated_at?: string
+          user_details?: Json | null
+          user_id: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          start_date?: string
+          status?: string | null
+          total_amount?: number
+          updated_at?: string
+          user_details?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cars: {
+        Row: {
+          available: boolean | null
+          brand: string
+          category: string
+          created_at: string
+          description: string | null
+          features: string[] | null
+          fuel_type: string
+          id: string
+          image: string
+          location: string | null
+          model: string
+          name: string
+          owner_email: string | null
+          owner_id: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          passengers: number
+          price_per_day: number
+          rating: number | null
+          transmission: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          available?: boolean | null
+          brand: string
+          category: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          fuel_type: string
+          id?: string
+          image: string
+          location?: string | null
+          model: string
+          name: string
+          owner_email?: string | null
+          owner_id?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          passengers: number
+          price_per_day: number
+          rating?: number | null
+          transmission: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          available?: boolean | null
+          brand?: string
+          category?: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          fuel_type?: string
+          id?: string
+          image?: string
+          location?: string | null
+          model?: string
+          name?: string
+          owner_email?: string | null
+          owner_id?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          passengers?: number
+          price_per_day?: number
+          rating?: number | null
+          transmission?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
