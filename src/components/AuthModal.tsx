@@ -58,13 +58,42 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           description: error.message,
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "Success",
-          description: "Logged in successfully!"
-        });
-        onClose();
+        return;
       }
+
+      // Fetch user profile to validate user type
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('email', formData.email)
+        .single();
+
+      if (profileError || !profile) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Login Failed",
+          description: "User profile not found",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate user type matches selected type
+      if (profile.user_type !== userType) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Access Denied",
+          description: `This account is registered as ${profile.user_type}. Please select the correct account type.`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully!"
+      });
+      onClose();
     } catch (err) {
       toast({
         title: "Error",
