@@ -77,10 +77,16 @@ const WhyChoose = () => {
               Join thousands of satisfied customers who trust CARzy for their transportation needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="gradient-primary text-primary-foreground px-8 py-3 rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-smooth shadow-soft">
+              <button 
+                onClick={() => window.location.href = '/cars'}
+                className="gradient-primary text-primary-foreground px-8 py-3 rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-smooth shadow-soft"
+              >
                 Start Booking
               </button>
-              <button className="border-2 border-primary text-primary px-8 py-3 rounded-xl font-semibold hover:gradient-primary hover:text-primary-foreground hover:scale-105 transition-smooth">
+              <button 
+                onClick={() => window.location.href = '/about'}
+                className="border-2 border-primary text-primary px-8 py-3 rounded-xl font-semibold hover:gradient-primary hover:text-primary-foreground hover:scale-105 transition-smooth"
+              >
                 Learn More
               </button>
             </div>
