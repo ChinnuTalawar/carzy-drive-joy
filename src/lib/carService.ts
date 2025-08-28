@@ -67,20 +67,22 @@ export const fetchCarDetails = async (carId: string): Promise<CarWithOwnerInfo |
       // If user is authorized, try to fetch owner contact info from the new table
       if (isAdmin || isOwner || hasBooking) {
         try {
-          // Use RPC call to get owner info since car_owners might not be in types yet
-          const { data: ownerData } = await supabase.rpc('get_car_owner_info', {
-            car_id_param: carId
-          });
+          // Temporary type casting until Supabase types are updated
+          const { data: ownerData } = await (supabase as any)
+            .from('car_owners')
+            .select('owner_name, owner_phone, owner_email')
+            .eq('car_id', carId)
+            .maybeSingle();
           
-          if (ownerData && ownerData.length > 0) {
+          if (ownerData) {
             ownerInfo = {
-              owner_name: ownerData[0].owner_name,
-              owner_phone: ownerData[0].owner_phone,
-              owner_email: ownerData[0].owner_email
+              owner_name: ownerData.owner_name,
+              owner_phone: ownerData.owner_phone,
+              owner_email: ownerData.owner_email
             };
           }
         } catch (error) {
-          // If RPC fails, owner info stays empty (privacy protected)
+          // If query fails, owner info stays empty (privacy protected)
           console.log("Owner info not available - privacy protected");
         }
       }

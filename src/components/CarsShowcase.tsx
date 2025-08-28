@@ -104,8 +104,13 @@ const CarsShowcase = () => {
                 <div className="relative overflow-hidden">
                   <img
                     src={car.image}
-                    alt={car.name}
+                    alt={`${car.name} - Premium car rental option`}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-smooth"
+                    onError={(e) => {
+                      // Fallback to static images if database image fails
+                      const fallbackImages = [carCompactImage, carLuxuryImage, carSuvImage, carSportsImage];
+                      e.currentTarget.src = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+                    }}
                   />
                   <div className="absolute top-3 left-3">
                     <span className="gradient-secondary px-3 py-1 rounded-full text-xs font-semibold text-secondary-foreground">
