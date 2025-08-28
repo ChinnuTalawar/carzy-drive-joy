@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Star, Users, Fuel, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchPublicCars } from "@/lib/carService";
 import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
 import carSuvImage from "@/assets/car-suv.jpg";
@@ -17,15 +17,8 @@ const CarsShowcase = () => {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const { data, error } = await supabase
-          .from("cars")
-          .select("*")
-          .eq("available", true)
-          .limit(4);
-        
-        if (data && !error) {
-          setCars(data);
-        }
+        const data = await fetchPublicCars({ available: true });
+        setCars(data.slice(0, 4)); // Limit to 4 cars for showcase
       } catch (error) {
         console.error("Error fetching cars:", error);
       } finally {

@@ -19,38 +19,17 @@ import {
   Shield,
   Car as CarIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
 import BookingModal from "@/components/BookingModal";
-
-interface Car {
-  id: string;
-  name: string;
-  brand: string;
-  model: string;
-  year: number;
-  price_per_day: number;
-  image: string;
-  rating: number;
-  passengers: number;
-  fuel_type: string;
-  transmission: string;
-  category: string;
-  available: boolean;
-  owner_name: string;
-  owner_phone: string;
-  owner_email: string;
-  location: string;
-  description: string;
-  features: string[];
-}
+import { fetchCarDetails, CarWithOwnerInfo } from "@/lib/carService";
+import { supabase } from "@/integrations/supabase/client";
 
 const CarDetails = () => {
   const { carId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [car, setCar] = useState<Car | null>(null);
+  const [car, setCar] = useState<CarWithOwnerInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [bookingModal, setBookingModal] = useState(false);
   const [user, setUser] = useState(null);
@@ -61,19 +40,12 @@ const CarDetails = () => {
       setUser(session?.user ?? null);
     });
 
-    const fetchCarDetails = async () => {
+    const fetchCarDetailsData = async () => {
       if (!carId) return;
 
       try {
-        const { data, error } = await supabase
-          .from("cars")
-          .select("*")
-          .eq("id", carId)
-          .single();
-
-        if (error) throw error;
-
-        setCar(data);
+        const carData = await fetchCarDetails(carId);
+        setCar(carData);
       } catch (error) {
         console.error("Error fetching car details:", error);
         toast({
@@ -87,7 +59,7 @@ const CarDetails = () => {
       }
     };
 
-    fetchCarDetails();
+    fetchCarDetailsData();
   }, [carId, navigate, toast]);
 
   const handleBookNow = () => {
@@ -270,36 +242,61 @@ const CarDetails = () => {
             {/* Owner Details */}
             <Card className="gradient-card border-border h-fit">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Owner Details</h3>
+                <h3 className="text-xl font-semibold mb-4">
+                  {car.owner_name ? "Owner Details" : "Contact Information"}
+                </h3>
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12 gradient-primary">
-                      <AvatarFallback className="text-primary-foreground font-semibold">
-                        {car.owner_name?.charAt(0) || "O"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold">{car.owner_name}</p>
-                      <p className="text-sm text-muted-foreground">Car Owner</p>
+                  {car.owner_name ? (
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-12 w-12 gradient-primary">
+                          <AvatarFallback className="text-primary-foreground font-semibold">
+                            {car.owner_name?.charAt(0) || "O"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{car.owner_name}</p>
+                          <p className="text-sm text-muted-foreground">Car Owner</p>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="space-y-3">
+                        {car.owner_phone && (
+                          <div className="flex items-center space-x-3">
+                            <Phone className="h-4 w-4 text-primary" />
+                            <span className="text-sm">{car.owner_phone}</span>
+                          </div>
+                        )}
+                        {car.owner_email && (
+                          <div className="flex items-center space-x-3">
+                            <Mail className="h-4 w-4 text-primary" />
+                            <span className="text-sm">{car.owner_email}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center space-x-3">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <span className="text-sm">{car.location}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="flex items-center justify-center mb-3">
+                        <Shield className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Owner contact information is private and only shared with confirmed bookings.
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-3 justify-center">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <span className="text-sm">{car.location}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.owner_phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.owner_email}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.location}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
