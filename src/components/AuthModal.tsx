@@ -29,8 +29,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     password: "",
     fullName: ""
   });
-  const [resetEmail, setResetEmail] = useState("");
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
@@ -96,47 +94,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
         description: "Logged in successfully!"
       });
       onClose();
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordReset = async () => {
-    if (!resetEmail) {
-      toast({
-        title: "Error",
-        description: "Please enter your email address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/`,
-      });
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Password reset link sent to your email!"
-        });
-        setShowForgotPassword(false);
-        setResetEmail("");
-      }
     } catch (err) {
       toast({
         title: "Error",
@@ -271,50 +228,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   </Button>
                 </div>
               </div>
-              
-              {showForgotPassword ? (
-                <div className="space-y-4 p-4 gradient-card rounded-lg border border-border">
-                  <div className="space-y-2">
-                    <Label htmlFor="reset-email">Reset Password</Label>
-                    <Input
-                      id="reset-email"
-                      type="email"
-                      placeholder="Enter your email for password reset"
-                      className="gradient-card border-border"
-                      value={resetEmail}
-                      onChange={(e) => setResetEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline"
-                      onClick={() => {
-                        setShowForgotPassword(false);
-                        setResetEmail("");
-                      }}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      onClick={handlePasswordReset}
-                      disabled={loading}
-                      className="flex-1 gradient-primary"
-                    >
-                      {loading ? "Sending..." : "Send Reset Link"}
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Button
-                  variant="link"
-                  onClick={() => setShowForgotPassword(true)}
-                  className="text-sm text-muted-foreground hover:text-primary w-full"
-                >
-                  Forgot Password?
-                </Button>
-              )}
-              
               <div className="space-y-2">
                 <Label htmlFor="login-type">Login as</Label>
                 <Select value={userType} onValueChange={setUserType}>

@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Users, Fuel, Settings, Calendar, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
-import BackButton from "@/components/BackButton";
 import { fetchPublicCars } from "@/lib/carService";
 import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
@@ -176,7 +175,6 @@ const Cars = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <BackButton customPath="/" />
       <main className="pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-4">

@@ -7,16 +7,19 @@ import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import BackButton from "@/components/BackButton";
+import { useTheme } from "@/components/ThemeProvider";
 import { 
   Settings as SettingsIcon, 
+  Moon, 
+  Sun, 
   Bell, 
   Shield, 
   Mail,
   Eye,
   Globe,
   Smartphone,
-  LogOut
+  LogOut,
+  Monitor
 } from "lucide-react";
 
 const Settings = () => {
@@ -36,6 +39,7 @@ const Settings = () => {
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     checkUser();
@@ -89,6 +93,27 @@ const Settings = () => {
     }
   };
 
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light':
+        return <Sun className="h-4 w-4" />;
+      case 'dark':
+        return <Moon className="h-4 w-4" />;
+      default:
+        return <Monitor className="h-4 w-4" />;
+    }
+  };
+
+  const getThemeLabel = () => {
+    switch (theme) {
+      case 'light':
+        return 'Light Mode';
+      case 'dark':
+        return 'Dark Mode';
+      default:
+        return 'System';
+    }
+  };
 
   if (loading) {
     return (
@@ -103,7 +128,6 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen gradient-card">
-      <BackButton customPath="/dashboard" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -115,20 +139,67 @@ const Settings = () => {
               Manage your account preferences and application settings
             </p>
           </div>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard')}
+            className="mt-4 md:mt-0"
+          >
+            Back to Dashboard
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Settings */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Language Settings */}
+            {/* Appearance Settings */}
             <Card className="gradient-card border-border">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <SettingsIcon className="h-5 w-5" />
-                  Preferences
+                  Appearance
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label className="flex items-center gap-2">
+                      {getThemeIcon()}
+                      Theme
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Current: {getThemeLabel()}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={theme === 'light' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('light')}
+                    >
+                      <Sun className="h-4 w-4 mr-2" />
+                      Light
+                    </Button>
+                    <Button
+                      variant={theme === 'dark' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('dark')}
+                    >
+                      <Moon className="h-4 w-4 mr-2" />
+                      Dark
+                    </Button>
+                    <Button
+                      variant={theme === 'system' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('system')}
+                    >
+                      <Monitor className="h-4 w-4 mr-2" />
+                      Auto
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label>Language</Label>

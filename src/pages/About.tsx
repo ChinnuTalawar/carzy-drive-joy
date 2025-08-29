@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
-import BackButton from "@/components/BackButton";
 import { 
   Car, 
   Users, 
@@ -81,7 +80,6 @@ const About = () => {
 
   return (
     <div className="min-h-screen gradient-card">
-      <BackButton customPath="/" />
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
