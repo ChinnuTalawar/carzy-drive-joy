@@ -8,15 +8,15 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Light Theme */
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* Light Theme - Fixed for proper contrast */
+    --background: 0 0% 98%;
+    --foreground: 240 10% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 240 10% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover-foreground: 240 10% 15%;
 
     /* CARzy Space Theme Colors */
     --primary: 260 100% 70%; /* Electric purple */
@@ -29,22 +29,22 @@ All colors MUST be HSL.
     --accent: 300 100% 75%; /* Bright magenta */
     --accent-foreground: 240 10% 4%;
 
-    --muted: 240 5% 20%; /* Lighter dark gray */
-    --muted-foreground: 240 5% 70%;
+    --muted: 240 5% 90%; /* Light gray for light mode */
+    --muted-foreground: 240 5% 40%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 95%;
 
-    --border: 240 10% 20%; /* Lighter border */
-    --input: 240 10% 20%;
+    --border: 240 10% 85%; /* Light border for light mode */
+    --input: 240 10% 95%;
     --ring: 260 100% 70%;
 
     /* Custom Space Design Tokens */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(220 100% 70%));
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-    --gradient-space: linear-gradient(135deg, hsl(240 10% 8%), hsl(240 20% 12%), hsl(260 30% 16%));
-    --gradient-card: linear-gradient(145deg, hsl(240 10% 10%), hsl(240 15% 12%));
+    --gradient-space: linear-gradient(135deg, hsl(0 0% 98%), hsl(240 20% 95%), hsl(260 30% 92%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 15% 98%));
     
     /* Glowing Shadows */
     --shadow-soft: 0 4px 20px -4px hsl(260 100% 70% / 0.2);

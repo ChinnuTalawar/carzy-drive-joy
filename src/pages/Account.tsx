@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import BackButton from "@/components/BackButton";
 import { 
   User, 
   Mail, 
@@ -187,6 +188,7 @@ const Account = () => {
 
   return (
     <div className="min-h-screen gradient-card">
+      <BackButton customPath="/dashboard" />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -198,13 +200,6 @@ const Account = () => {
               Manage your personal information and account settings
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/dashboard')}
-            className="mt-4 md:mt-0"
-          >
-            Back to Dashboard
-          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

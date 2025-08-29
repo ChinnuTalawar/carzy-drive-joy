@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
+import BackButton from "@/components/BackButton";
 import BookingModal from "@/components/BookingModal";
 import { fetchCarDetails, CarWithOwnerInfo } from "@/lib/carService";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,18 +115,9 @@ const CarDetails = () => {
   return (
     <div className="min-h-screen">
       <Header />
+      <BackButton customPath="/cars" />
       <main className="pt-20 p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <Button
-            variant="outline"
-            onClick={() => navigate(-1)}
-            className="mb-6 gradient-card border-border"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* Car Image */}
             <div className="space-y-4">

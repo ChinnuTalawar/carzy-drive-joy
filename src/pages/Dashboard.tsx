@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import BackButton from "@/components/BackButton";
 import { 
   Car, 
   Users, 
@@ -269,6 +270,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen gradient-card">
+      <BackButton customPath="/" />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
