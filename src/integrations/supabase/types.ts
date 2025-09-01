@@ -136,12 +136,40 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_usage: {
+        Row: {
+          count: number
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          mobile_number: string | null
           updated_at: string
           user_id: string
           user_type: string | null
@@ -151,6 +179,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          mobile_number?: string | null
           updated_at?: string
           user_id: string
           user_type?: string | null
@@ -160,6 +189,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          mobile_number?: string | null
           updated_at?: string
           user_id?: string
           user_type?: string | null
@@ -171,7 +201,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_increment_otp_usage: {
+        Args: { user_email_param: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
