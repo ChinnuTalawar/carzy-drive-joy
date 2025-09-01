@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import BackButton from "@/components/BackButton";
 import { 
   Phone, 
   Mail, 
@@ -85,7 +86,8 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen gradient-card">
-      <div className="container mx-auto px-4 py-8">
+      <BackButton />
+      <div className="container mx-auto px-4 py-8 pt-16">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
