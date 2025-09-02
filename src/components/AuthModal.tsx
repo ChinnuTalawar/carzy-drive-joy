@@ -231,10 +231,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     sendOtp();
   };
 
-  const handleSignup = () => {
-    const contact = contactMethod === "email" ? formData.email : formData.mobile;
-    
-    if (!contact || !formData.fullName || !userType) {
+  const handleSignup = async () => {
+    if (!formData.email || !formData.fullName || !userType) {
       toast({
         title: "Error",
         description: "Please fill all fields",
@@ -253,7 +251,42 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
       return;
     }
 
-    sendOtp();
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: "temp_password", // Will be set via email verification
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: formData.fullName,
+            user_type: userType
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Check your email",
+          description: "We sent you a verification link to complete your signup"
+        });
+        setCurrentTab("login");
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to create account",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getUserTypeIcon = (type: string) => {
@@ -406,56 +439,16 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
               </div>
               
               <div className="space-y-2">
-                <Label>Contact Method</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={contactMethod === "email" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setContactMethod("email")}
-                    className="flex-1"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={contactMethod === "mobile" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setContactMethod("mobile")}
-                    className="flex-1"
-                  >
-                    <Smartphone className="h-4 w-4 mr-2" />
-                    Mobile
-                  </Button>
-                </div>
+                <Label htmlFor="signup-email">Email</Label>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className="gradient-card border-border"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                />
               </div>
-              
-              {contactMethod === "email" ? (
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="gradient-card border-border"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange("email", e.target.value)}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Label htmlFor="signup-mobile">Mobile Number</Label>
-                  <Input
-                    id="signup-mobile"
-                    type="tel"
-                    placeholder="Enter your mobile number"
-                    className="gradient-card border-border"
-                    value={formData.mobile}
-                    onChange={(e) => handleInputChange("mobile", e.target.value)}
-                  />
-                </div>
-              )}
               
               <div className="space-y-2">
                 <Label htmlFor="signup-type">Sign up as</Label>
@@ -485,8 +478,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 onClick={handleSignup}
                 disabled={loading}
               >
-                <KeyRound className="h-4 w-4 mr-2" />
-                {loading ? "Sending OTP..." : "Sign Up with OTP"}
+                <Mail className="h-4 w-4 mr-2" />
+                {loading ? "Creating Account..." : "Sign Up with Email"}
               </Button>
             </div>
           </TabsContent>

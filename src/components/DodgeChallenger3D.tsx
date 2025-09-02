@@ -19,10 +19,10 @@ const CarModel = () => {
       <mesh position={[0, 0.5, 0]}>
         <boxGeometry args={[4.2, 1, 1.9]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.95} 
-          roughness={0.05}
-          envMapIntensity={2}
+          color="#8b0000" 
+          metalness={0.8} 
+          roughness={0.2}
+          envMapIntensity={1.5}
         />
       </mesh>
       
@@ -30,9 +30,9 @@ const CarModel = () => {
       <mesh position={[1.8, 0.9, 0]}>
         <boxGeometry args={[1.2, 0.3, 1.7]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.95} 
-          roughness={0.05}
+          color="#8b0000" 
+          metalness={0.8} 
+          roughness={0.2}
         />
       </mesh>
       
@@ -40,9 +40,9 @@ const CarModel = () => {
       <mesh position={[1.6, 1.1, 0]}>
         <boxGeometry args={[0.8, 0.2, 0.6]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.95} 
-          roughness={0.05}
+          color="#2a2a2a" 
+          metalness={0.9} 
+          roughness={0.1}
         />
       </mesh>
       
@@ -50,9 +50,9 @@ const CarModel = () => {
       <mesh position={[-0.3, 1.5, 0]}>
         <boxGeometry args={[2.2, 0.5, 1.7]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.95} 
-          roughness={0.05}
+          color="#1a1a1a" 
+          metalness={0.9} 
+          roughness={0.1}
         />
       </mesh>
       
@@ -100,9 +100,9 @@ const CarModel = () => {
       <mesh position={[2.3, 0.2, 0]}>
         <boxGeometry args={[0.3, 0.4, 1.8]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.9} 
-          roughness={0.1}
+          color="#8b0000" 
+          metalness={0.8} 
+          roughness={0.2}
         />
       </mesh>
       
@@ -110,20 +110,46 @@ const CarModel = () => {
       <mesh position={[-2.3, 0.2, 0]}>
         <boxGeometry args={[0.3, 0.4, 1.8]} />
         <meshStandardMaterial 
-          color="#0a0a0a" 
-          metalness={0.9} 
-          roughness={0.1}
+          color="#8b0000" 
+          metalness={0.8} 
+          roughness={0.2}
         />
       </mesh>
       
       {/* Side mirrors */}
       <mesh position={[0.8, 1.4, 1.1]}>
         <boxGeometry args={[0.2, 0.15, 0.1]} />
-        <meshStandardMaterial color="#0a0a0a" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
       </mesh>
       <mesh position={[0.8, 1.4, -1.1]}>
         <boxGeometry args={[0.2, 0.15, 0.1]} />
-        <meshStandardMaterial color="#0a0a0a" metalness={0.9} roughness={0.1} />
+        <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.1} />
+      </mesh>
+      
+      {/* Racing stripes */}
+      <mesh position={[0, 0.51, 0]}>
+        <boxGeometry args={[4.2, 0.01, 0.3]} />
+        <meshStandardMaterial 
+          color="#ffffff" 
+          metalness={0.1} 
+          roughness={0.8}
+        />
+      </mesh>
+      <mesh position={[0, 0.51, 0.4]}>
+        <boxGeometry args={[4.2, 0.01, 0.1]} />
+        <meshStandardMaterial 
+          color="#ffffff" 
+          metalness={0.1} 
+          roughness={0.8}
+        />
+      </mesh>
+      <mesh position={[0, 0.51, -0.4]}>
+        <boxGeometry args={[4.2, 0.01, 0.1]} />
+        <meshStandardMaterial 
+          color="#ffffff" 
+          metalness={0.1} 
+          roughness={0.8}
+        />
       </mesh>
       
       {/* Wheels with more detail */}
@@ -212,10 +238,11 @@ const DodgeChallenger3D = () => {
         camera={{ position: [5, 3, 5], fov: 50 }}
         style={{ background: 'transparent' }}
       >
-        <ambientLight intensity={0.4} />
-        <directionalLight position={[10, 10, 5]} intensity={1} />
-        <pointLight position={[-10, -10, -5]} color="#8b5cf6" intensity={0.5} />
-        <pointLight position={[10, -10, 5]} color="#3b82f6" intensity={0.5} />
+        <ambientLight intensity={0.6} />
+        <directionalLight position={[10, 10, 5]} intensity={1.2} />
+        <pointLight position={[-10, -10, -5]} color="#ff4444" intensity={0.8} />
+        <pointLight position={[10, -10, 5]} color="#ffffff" intensity={0.6} />
+        <spotLight position={[0, 10, 0]} intensity={1} angle={0.3} penumbra={1} />
         
         <CarModel />
         
