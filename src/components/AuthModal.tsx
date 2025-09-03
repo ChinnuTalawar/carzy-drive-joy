@@ -49,24 +49,54 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password
       });
 
-      if (error) {
+      if (authError) {
         toast({
           title: "Error",
-          description: error.message,
+          description: authError.message,
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "Success",
-          description: "Logged in successfully!"
-        });
-        onClose();
+        return;
       }
+
+      // Verify user type matches the selected type
+      if (authData.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (profileError) {
+          await supabase.auth.signOut();
+          toast({
+            title: "Error",
+            description: "Failed to verify user type",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (profile.user_type !== userType) {
+          await supabase.auth.signOut();
+          toast({
+            title: "Error",
+            description: `You cannot login as ${userType === 'user' ? 'Customer' : userType === 'car-owner' ? 'Car Owner' : 'Admin'}. Your account type is ${profile.user_type === 'user' ? 'Customer' : profile.user_type === 'car-owner' ? 'Car Owner' : 'Admin'}.`,
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      toast({
+        title: "Success",
+        description: "Logged in successfully!"
+      });
+      onClose();
     } catch (err) {
       toast({
         title: "Error",
