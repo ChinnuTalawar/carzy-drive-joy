@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Car } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
@@ -9,6 +9,7 @@ import SearchModal from "./SearchModal";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
@@ -17,6 +18,54 @@ const Header = () => {
     initialTab: "login" | "signup";
   }>({ isOpen: false, initialTab: "login" });
   const [searchModal, setSearchModal] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+
+  // Check if current page is home page
+  const isHomePage = location.pathname === "/";
+
+  // Auto-hide header functionality for non-home pages
+  useEffect(() => {
+    if (isHomePage) {
+      setIsHeaderVisible(true);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Show header when mouse is near the top (within 100px)
+      if (e.clientY <= 100) {
+        setIsHeaderVisible(true);
+        
+        // Clear existing timeout
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        
+        // Hide after 3 seconds of no mouse movement at top
+        timeoutId = setTimeout(() => {
+          if (e.clientY > 100) {
+            setIsHeaderVisible(false);
+          }
+        }, 3000);
+      } else if (e.clientY > 150) {
+        // Hide header when mouse moves away from top
+        setIsHeaderVisible(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+
+    // Initially hide header on non-home pages
+    setIsHeaderVisible(false);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isHomePage]);
 
   // Authentication state management
   useEffect(() => {
@@ -56,7 +105,9 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft">
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft transition-transform duration-300 ease-in-out ${
+      isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
