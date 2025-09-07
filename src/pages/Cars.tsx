@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, Fuel, Settings, Calendar, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import BackButton from "@/components/BackButton";
+
 import Header from "@/components/Header";
 import { fetchPublicCars } from "@/lib/carService";
 import carCompactImage from "@/assets/car-compact.jpg";
@@ -175,7 +175,6 @@ const Cars = () => {
 
   return (
     <div className="min-h-screen">
-      <BackButton />
       <Header />
       <main className="pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -215,6 +214,10 @@ const Cars = () => {
                     src={car.image}
                     alt={car.name}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-smooth"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
                   />
                   <div className="absolute top-3 left-3">
                     <Badge className="gradient-secondary text-secondary-foreground">

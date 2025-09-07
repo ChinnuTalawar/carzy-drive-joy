@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import BackButton from "@/components/BackButton";
+
 import { 
   Calendar, 
   Car, 
@@ -313,7 +313,6 @@ const BookingHistory = () => {
 
   return (
     <div className="min-h-screen gradient-card">
-      <BackButton />
       <div className="container mx-auto px-4 py-8 pt-16">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">

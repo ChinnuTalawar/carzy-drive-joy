@@ -27,7 +27,7 @@ import { fetchCarDetails, CarWithOwnerInfo } from "@/lib/carService";
 import { supabase } from "@/integrations/supabase/client";
 
 const CarDetails = () => {
-  const { carId } = useParams();
+  const { carId } = useParams<{ carId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [car, setCar] = useState<CarWithOwnerInfo | null>(null);
@@ -42,7 +42,10 @@ const CarDetails = () => {
     });
 
     const fetchCarDetailsData = async () => {
-      if (!carId) return;
+      if (!carId) {
+        navigate("/cars");
+        return;
+      }
 
       try {
         const carData = await fetchCarDetails(carId);
@@ -114,7 +117,6 @@ const CarDetails = () => {
 
   return (
     <div className="min-h-screen">
-      <BackButton />
       <Header />
       <main className="pt-20 p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
@@ -125,6 +127,10 @@ const CarDetails = () => {
                 src={car.image}
                 alt={car.name}
                 className="w-full h-96 object-cover rounded-xl shadow-strong"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder.svg';
+                }}
               />
             </div>
 
