@@ -120,23 +120,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      // First check if email exists in profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_id')
-        .eq('email', formData.forgotEmail)
-        .single();
-
-      if (profileError || !profile) {
-        toast({
-          title: "Error",
-          description: "No account found with this email address",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
-      }
-
       const { error } = await supabase.auth.resetPasswordForEmail(formData.forgotEmail, {
         redirectTo: `${window.location.origin}/reset-password`
       });
@@ -150,7 +133,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
       } else {
         toast({
           title: "Success",
-          description: "Password reset link sent to your email"
+          description: "If an account with this email exists, a password reset link has been sent"
         });
         setCurrentTab("login");
       }
