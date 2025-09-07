@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car } from "lucide-react";
+import { Menu, X, Car, ArrowLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AuthModal from "./AuthModal";
@@ -110,18 +110,30 @@ const Header = () => {
     }`}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <button 
-            onClick={() => navigate("/")} 
-            className="flex items-center space-x-2 hover:opacity-80 transition-smooth"
-          >
-            <div className="gradient-primary p-2 rounded-xl shadow-soft">
-              <Car className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-extrabold gradient-primary bg-clip-text text-transparent tracking-wider">
-              CARzy
-            </span>
-          </button>
+          {/* Logo or Back Button */}
+          {isHomePage ? (
+            <button 
+              onClick={() => navigate("/")} 
+              className="flex items-center space-x-2 hover:opacity-80 transition-smooth"
+            >
+              <div className="gradient-primary p-2 rounded-xl shadow-soft">
+                <Car className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <span className="text-2xl font-extrabold gradient-primary bg-clip-text text-transparent tracking-wider">
+                CARzy
+              </span>
+            </button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="backdrop-blur-sm bg-background/80 border border-border hover:bg-accent"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          )}
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
