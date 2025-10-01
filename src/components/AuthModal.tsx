@@ -226,25 +226,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           <TabsContent value="login" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
+                <Label htmlFor="login-email" className="text-foreground">Email</Label>
                 <Input
                   id="login-email"
                   type="email"
                   placeholder="Enter your email"
-                  className="gradient-card border-border"
+                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
+                <Label htmlFor="login-password" className="text-foreground">Password</Label>
                 <div className="relative">
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className="gradient-card border-border pr-10"
+                    className="gradient-card border-border text-foreground placeholder:text-muted-foreground pr-10"
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                   />
@@ -265,25 +265,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="login-type">Login as</Label>
+                <Label htmlFor="login-type" className="text-foreground">Login as</Label>
                 <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border">
-                    <SelectValue placeholder="Select user type" />
+                  <SelectTrigger className="gradient-card border-border text-foreground">
+                    <SelectValue placeholder="Select user type" className="text-foreground" />
                   </SelectTrigger>
                   <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user">
+                    <SelectItem value="user" className="text-foreground">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Customer
                       </div>
                     </SelectItem>
-                    <SelectItem value="car-owner">
+                    <SelectItem value="car-owner" className="text-foreground">
                       <div className="flex items-center gap-2">
                         <Car className="h-4 w-4" />
                         Car Owner
                       </div>
                     </SelectItem>
-                    <SelectItem value="admin">
+                    <SelectItem value="admin" className="text-foreground">
                       <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4" />
                         Admin
@@ -318,43 +318,43 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           <TabsContent value="signup" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
+                <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
                 <Input
                   id="signup-name"
                   type="text"
                   placeholder="Enter your full name"
-                  className="gradient-card border-border"
+                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange("fullName", e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
+                <Label htmlFor="signup-email" className="text-foreground">Email</Label>
                 <Input
                   id="signup-email"
                   type="email"
                   placeholder="Enter your email"
-                  className="gradient-card border-border"
+                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="signup-type">Sign up as</Label>
+                <Label htmlFor="signup-type" className="text-foreground">Sign up as</Label>
                 <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border">
-                    <SelectValue placeholder="Select user type" />
+                  <SelectTrigger className="gradient-card border-border text-foreground">
+                    <SelectValue placeholder="Select user type" className="text-foreground" />
                   </SelectTrigger>
                   <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user">
+                    <SelectItem value="user" className="text-foreground">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Customer
                       </div>
                     </SelectItem>
-                    <SelectItem value="car-owner">
+                    <SelectItem value="car-owner" className="text-foreground">
                       <div className="flex items-center gap-2">
                         <Car className="h-4 w-4" />
                         Car Owner
@@ -378,19 +378,19 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           <TabsContent value="forgot" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2">Reset Password</h3>
+                <h3 className="text-lg font-semibold mb-2 text-foreground">Reset Password</h3>
                 <p className="text-sm text-muted-foreground">
                   Enter your email to receive a password reset link
                 </p>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="forgot-email">Email</Label>
+                <Label htmlFor="forgot-email" className="text-foreground">Email</Label>
                 <Input
                   id="forgot-email"
                   type="email"
                   placeholder="Enter your email"
-                  className="gradient-card border-border"
+                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
                   value={formData.forgotEmail}
                   onChange={(e) => handleInputChange("forgotEmail", e.target.value)}
                 />
