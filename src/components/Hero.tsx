@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Star, Users, Car, Shield } from "lucide-react";
-import DodgeChallenger3D from "./DodgeChallenger3D";
+import heroImage from "@/assets/hero-car.jpg";
 
 const Hero = () => {
   return (
@@ -30,10 +30,14 @@ const Hero = () => {
 
           </div>
 
-          {/* Right Content - 3D Car Model */}
+          {/* Right Content - Hero Image */}
           <div className="relative">
-            <div className="relative z-10">
-              <DodgeChallenger3D />
+            <div className="relative z-10 rounded-2xl overflow-hidden shadow-glow">
+              <img 
+                src={heroImage} 
+                alt="Premium car rental" 
+                className="w-full h-auto object-cover"
+              />
             </div>
             {/* Decorative space elements */}
             <div className="absolute -top-4 -right-4 w-20 h-20 gradient-secondary rounded-full opacity-30 blur-xl animate-pulse"></div>
