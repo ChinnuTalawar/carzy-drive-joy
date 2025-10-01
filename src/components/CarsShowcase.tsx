@@ -81,7 +81,7 @@ const CarsShowcase = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Choose Your Perfect{" "}
             <span className="gradient-primary bg-clip-text text-transparent">
               Ride
@@ -128,7 +128,7 @@ const CarsShowcase = () => {
                 {/* Car Details */}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold">{car.name}</h3>
+                    <h3 className="text-lg font-semibold text-foreground">{car.name}</h3>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-primary">₹{car.price_per_day || car.price}</div>
                       <div className="text-xs text-muted-foreground">per day</div>

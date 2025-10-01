@@ -187,7 +187,7 @@ const Contact = () => {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {info.details.map((detail, idx) => (
-                    <p key={idx} className="font-medium">{detail}</p>
+                    <p key={idx} className="font-medium text-foreground">{detail}</p>
                   ))}
                   <p className="text-sm text-muted-foreground">{info.description}</p>
                 </CardContent>
@@ -255,7 +255,7 @@ const Contact = () => {
 
         {/* FAQ Section */}
         <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
           <p className="text-muted-foreground mb-8">
             Can't find what you're looking for? Check out our FAQ section or contact us directly.
           </p>

@@ -33,7 +33,7 @@ const WhyChoose = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Why Choose{" "}
             <span className="gradient-primary bg-clip-text text-transparent">
               CARzy?
@@ -59,7 +59,7 @@ const WhyChoose = () => {
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
@@ -70,7 +70,7 @@ const WhyChoose = () => {
         {/* Bottom CTA */}
         <div className="text-center mt-12">
           <div className="gradient-card p-8 rounded-2xl shadow-medium max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">
+            <h3 className="text-2xl font-bold text-foreground mb-4">
               Ready to Hit the Road?
             </h3>
             <p className="text-muted-foreground mb-6">

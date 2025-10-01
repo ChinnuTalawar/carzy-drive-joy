@@ -306,7 +306,7 @@ const Dashboard = () => {
                 <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
+                <div className="text-2xl font-bold text-foreground">{stat.value}</div>
               </CardContent>
             </Card>
           ))}
@@ -328,7 +328,7 @@ const Dashboard = () => {
                   recentBookings.map((booking) => (
                     <div key={booking.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/20">
                       <div>
-                        <p className="font-medium">{booking.car_name}</p>
+                        <p className="font-medium text-foreground">{booking.car_name}</p>
                         <p className="text-sm text-muted-foreground">
                           {userType !== 'user' ? booking.user_email : 'Your booking'}
                         </p>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">₹{booking.total_amount.toLocaleString()}</p>
+                        <p className="font-medium text-foreground">₹{booking.total_amount.toLocaleString()}</p>
                         <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
                           {booking.status}
                         </Badge>

@@ -184,7 +184,7 @@ const Cars = () => {
 
           {/* Category Filter */}
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Filter by Category</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Filter by Category</h2>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
@@ -243,7 +243,7 @@ const Cars = () => {
                 {/* Car Details */}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold">{car.name}</h3>
+                    <h3 className="text-lg font-semibold text-foreground">{car.name}</h3>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">₹{car.price_per_day || car.price}</div>
                         <div className="text-xs text-muted-foreground">per day</div>

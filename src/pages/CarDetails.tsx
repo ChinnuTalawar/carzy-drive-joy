@@ -107,7 +107,7 @@ const CarDetails = () => {
         <Header />
         <main className="pt-20 p-6">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-2xl font-bold mb-4">Car not found</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-4">Car not found</h1>
             <Button onClick={() => navigate("/cars")}>Back to Cars</Button>
           </div>
         </main>
@@ -173,7 +173,7 @@ const CarDetails = () => {
               {/* Car Features */}
               <Card className="gradient-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">Car Features</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Car Features</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Users className="h-4 w-4 text-primary" />
@@ -212,7 +212,7 @@ const CarDetails = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card className="gradient-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Description</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Description</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     {car.description}
                   </p>
@@ -223,7 +223,7 @@ const CarDetails = () => {
               {car.features && car.features.length > 0 && (
                 <Card className="gradient-card border-border">
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-4">Additional Features</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">Additional Features</h3>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {car.features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-2">
@@ -240,7 +240,7 @@ const CarDetails = () => {
             {/* Owner Details */}
             <Card className="gradient-card border-border h-fit">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">
+                <h3 className="text-xl font-semibold text-foreground mb-4">
                   {car.owner_name ? "Owner Details" : "Contact Information"}
                 </h3>
                 <div className="space-y-4">

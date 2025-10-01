@@ -364,7 +364,7 @@ const BookingHistory = () => {
                 <Card className="gradient-card border-border">
                   <CardContent className="p-12 text-center">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No bookings found</h3>
                     <p className="text-muted-foreground">There are no bookings to display.</p>
                   </CardContent>
                 </Card>
@@ -380,7 +380,7 @@ const BookingHistory = () => {
                 <Card className="gradient-card border-border">
                   <CardContent className="p-12 text-center">
                     <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No customer bookings</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No customer bookings</h3>
                     <p className="text-muted-foreground">No customer bookings to display.</p>
                   </CardContent>
                 </Card>
@@ -396,7 +396,7 @@ const BookingHistory = () => {
                 <Card className="gradient-card border-border">
                   <CardContent className="p-12 text-center">
                     <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No owner sales</h3>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">No owner sales</h3>
                     <p className="text-muted-foreground">No car owner sales to display.</p>
                   </CardContent>
                 </Card>
@@ -413,7 +413,7 @@ const BookingHistory = () => {
               <Card className="gradient-card border-border">
                 <CardContent className="p-12 text-center">
                   <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No bookings yet</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No bookings yet</h3>
                   <p className="text-muted-foreground mb-4">
                     {userType === 'car-owner' 
                       ? "You haven't received any bookings for your cars yet."

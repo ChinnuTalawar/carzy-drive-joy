@@ -146,7 +146,7 @@ const About = () => {
 
         {/* Stats Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">CARzy by the Numbers</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">CARzy by the Numbers</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {stats.map((stat, index) => (
               <Card key={index} className="gradient-card border-border text-center hover:shadow-glow transition-smooth">
@@ -164,7 +164,7 @@ const About = () => {
 
         {/* Features Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Why Choose CARzy?</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Why Choose CARzy?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <Card key={index} className="gradient-card border-border hover:shadow-glow transition-smooth group">
@@ -172,7 +172,7 @@ const About = () => {
                   <div className="gradient-primary p-4 rounded-2xl w-fit mx-auto mb-4 group-hover:shadow-glow transition-smooth">
                     <feature.icon className="h-8 w-8 text-primary-foreground" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -182,7 +182,7 @@ const About = () => {
 
         {/* Timeline Section */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Our Journey</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Our Journey</h2>
           <div className="max-w-4xl mx-auto">
             <div className="space-y-6">
               {milestones.map((milestone, index) => (
@@ -195,7 +195,7 @@ const About = () => {
                         </Badge>
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                        <h3 className="text-xl font-semibold text-foreground mb-2 flex items-center gap-2">
                           <CheckCircle className="h-5 w-5 text-green-500" />
                           {milestone.title}
                         </h3>
@@ -211,7 +211,7 @@ const About = () => {
 
         {/* Customer Reviews */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8">What Our Customers Say</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">What Our Customers Say</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {reviews.map((review, index) => (
               <Card key={index} className="gradient-card border-border">
@@ -223,7 +223,7 @@ const About = () => {
                   </div>
                   <p className="text-muted-foreground mb-4 italic">"{review.comment}"</p>
                   <div>
-                    <p className="font-semibold">{review.name}</p>
+                    <p className="font-semibold text-foreground">{review.name}</p>
                     <p className="text-sm text-muted-foreground">{review.location}</p>
                   </div>
                 </CardContent>
@@ -236,7 +236,7 @@ const About = () => {
         <div className="text-center">
           <Card className="gradient-card border-border max-w-2xl mx-auto">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold mb-4">Ready to Experience CARzy?</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Ready to Experience CARzy?</h2>
               <p className="text-muted-foreground mb-6">
                 Join thousands of satisfied customers who trust CARzy for their transportation needs. 
                 Book your perfect car today and start your journey with us.
