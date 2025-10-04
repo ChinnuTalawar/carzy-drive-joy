@@ -1,3 +1,6 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +17,9 @@ import { User, Shield, Car, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+// ============================================
+// TYPES
+// ============================================
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,6 +27,10 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) => {
+  // ============================================
+  // STATE
+  // ============================================
+  const { toast } = useToast();
   const [userType, setUserType] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -31,12 +41,17 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     fullName: "",
     forgotEmail: ""
   });
-  const { toast } = useToast();
 
+  // ============================================
+  // HELPERS
+  // ============================================
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // ============================================
+  // LOGIN HANDLER
+  // ============================================
   const handleLogin = async () => {
     if (!formData.email || !formData.password || !userType) {
       toast({
@@ -108,6 +123,9 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     }
   };
 
+  // ============================================
+  // FORGOT PASSWORD HANDLER
+  // ============================================
   const handleForgotPassword = async () => {
     if (!formData.forgotEmail) {
       toast({
@@ -148,6 +166,9 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     }
   };
 
+  // ============================================
+  // SIGNUP HANDLER
+  // ============================================
   const handleSignup = async () => {
     if (!formData.email || !formData.fullName || !userType) {
       toast({
@@ -206,6 +227,9 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     }
   };
 
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md gradient-card border-border">
@@ -223,6 +247,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
             </TabsList>
           )}
           
+          {/* ========== LOGIN TAB ========== */}
           <TabsContent value="login" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -315,6 +340,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
             </div>
           </TabsContent>
           
+          {/* ========== SIGNUP TAB ========== */}
           <TabsContent value="signup" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
@@ -375,6 +401,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
             </div>
           </TabsContent>
           
+          {/* ========== FORGOT PASSWORD TAB ========== */}
           <TabsContent value="forgot" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="text-center">

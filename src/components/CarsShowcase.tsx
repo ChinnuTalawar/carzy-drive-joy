@@ -1,3 +1,6 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,10 +13,16 @@ import carSuvImage from "@/assets/car-suv.jpg";
 import carSportsImage from "@/assets/car-sports.jpg";
 
 const CarsShowcase = () => {
+  // ============================================
+  // STATE & HOOKS
+  // ============================================
   const navigate = useNavigate();
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // ============================================
+  // FETCH CARS FROM DATABASE
+  // ============================================
   useEffect(() => {
     const fetchCars = async () => {
       try {
@@ -29,6 +38,9 @@ const CarsShowcase = () => {
     fetchCars();
   }, []);
 
+  // ============================================
+  // STATIC FALLBACK DATA
+  // ============================================
   const staticCars = [
     {
       id: 1,
@@ -76,10 +88,13 @@ const CarsShowcase = () => {
     }
   ];
 
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <section id="cars" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* ========== Section Header ========== */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Choose Your Perfect{" "}
@@ -92,7 +107,7 @@ const CarsShowcase = () => {
           </p>
         </div>
 
-        {/* Cars Grid */}
+        {/* ========== Cars Grid ========== */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {(cars.length > 0 ? cars : staticCars).map((car) => (
             <Card 
@@ -100,7 +115,7 @@ const CarsShowcase = () => {
               className="group hover:shadow-strong transition-smooth hover:-translate-y-2 border-0 shadow-soft gradient-card overflow-hidden"
             >
               <CardContent className="p-0">
-                {/* Car Image */}
+                {/* --- Car Image --- */}
                 <div className="relative overflow-hidden">
                   <img
                     src={car.image}
@@ -125,7 +140,7 @@ const CarsShowcase = () => {
                   </div>
                 </div>
 
-                {/* Car Details */}
+                {/* --- Car Details --- */}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-semibold text-foreground">{car.name}</h3>
@@ -135,7 +150,7 @@ const CarsShowcase = () => {
                     </div>
                   </div>
 
-                  {/* Features */}
+                  {/* --- Features Icons --- */}
                   <div className="grid grid-cols-3 gap-2 mb-6 text-xs text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <Users className="h-3 w-3" />
@@ -151,7 +166,7 @@ const CarsShowcase = () => {
                     </div>
                   </div>
 
-                  {/* CTA Button */}
+                  {/* --- Rent Now Button --- */}
                   <Button 
                     variant="default" 
                     className="w-full"
@@ -165,7 +180,7 @@ const CarsShowcase = () => {
           ))}
         </div>
 
-        {/* View All Cars Button */}
+        {/* ========== View All Button ========== */}
         <div className="text-center mt-12">
           <Button 
             variant="outline" 

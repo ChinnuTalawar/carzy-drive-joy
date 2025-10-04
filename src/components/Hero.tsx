@@ -1,3 +1,6 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { Button } from "@/components/ui/button";
 import { Star, Users, Car, Shield } from "lucide-react";
 import heroImage from "@/assets/hero-car.jpg";
@@ -6,8 +9,11 @@ const Hero = () => {
   return (
     <section id="home" className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 gradient-card">
       <div className="max-w-7xl mx-auto">
+        {/* ============================================ */}
+        {/* HERO CONTENT GRID */}
+        {/* ============================================ */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
+          {/* ========== Left Content: Heading & CTA ========== */}
           <div className="space-y-8">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-bold leading-tight">
@@ -27,10 +33,9 @@ const Hero = () => {
                 Start Booking
               </Button>
             </div>
-
           </div>
 
-          {/* Right Content - Hero Image */}
+          {/* ========== Right Content: Hero Image ========== */}
           <div className="relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-glow">
               <img 
@@ -46,7 +51,9 @@ const Hero = () => {
           </div>
         </div>
         
-        {/* Stats moved to bottom */}
+        {/* ============================================ */}
+        {/* STATS SECTION */}
+        {/* ============================================ */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-16 max-w-4xl mx-auto">
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">

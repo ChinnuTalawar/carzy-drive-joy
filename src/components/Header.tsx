@@ -1,3 +1,6 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Car, ArrowLeft } from "lucide-react";
@@ -8,23 +11,33 @@ import UserMenu from "./UserMenu";
 import SearchModal from "./SearchModal";
 
 const Header = () => {
+  // ============================================
+  // STATE & HOOKS
+  // ============================================
   const navigate = useNavigate();
   const location = useLocation();
+  const isHomePage = location.pathname === "/";
+  
+  // UI State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  
+  // Auth State
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
+  
+  // Modal State
   const [authModal, setAuthModal] = useState<{
     isOpen: boolean;
     initialTab: "login" | "signup";
   }>({ isOpen: false, initialTab: "login" });
   const [searchModal, setSearchModal] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
-  // Check if current page is home page
-  const isHomePage = location.pathname === "/";
-
-  // Auto-hide header functionality for non-home pages
+  // ============================================
+  // AUTO-HIDE HEADER (for non-home pages)
+  // ============================================
   useEffect(() => {
+    // Always show header on homepage
     if (isHomePage) {
       setIsHeaderVisible(true);
       return;
@@ -55,9 +68,7 @@ const Header = () => {
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-
-    // Initially hide header on non-home pages
-    setIsHeaderVisible(false);
+    setIsHeaderVisible(false); // Initially hide header on non-home pages
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
@@ -67,7 +78,9 @@ const Header = () => {
     };
   }, [isHomePage]);
 
-  // Authentication state management
+  // ============================================
+  // AUTHENTICATION STATE
+  // ============================================
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -86,12 +99,18 @@ const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // ============================================
+  // NAVIGATION CONFIG
+  // ============================================
   const navItems = [
     { name: "Home", href: "#home" },
     { name: "Cars", href: "#cars" },
     { name: "Contact", href: "#contact" },
   ];
 
+  // ============================================
+  // EVENT HANDLERS
+  // ============================================
   const handleNavClick = (href: string) => {
     if (href === "#cars") {
       window.location.href = "/cars";
@@ -104,6 +123,9 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft transition-transform duration-300 ease-in-out ${
       isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
