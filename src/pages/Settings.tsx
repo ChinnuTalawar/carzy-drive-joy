@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useTheme } from "@/components/ThemeProvider";
+import { getPrimaryRole, getUserTypeName as getRoleLabel, type AppRole } from "@/lib/roleService";
 
 import { 
   Settings as SettingsIcon, 
@@ -26,6 +27,7 @@ import {
 const Settings = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [userRole, setUserRole] = useState<AppRole>("user");
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState({
     email: true,
@@ -66,6 +68,10 @@ const Settings = () => {
       if (profileData) {
         setProfile(profileData);
       }
+
+      // Get user's primary role
+      const primaryRole = await getPrimaryRole(session.user.id);
+      setUserRole(primaryRole);
     } catch (error) {
       console.error('Error checking user:', error);
     } finally {
@@ -342,7 +348,7 @@ const Settings = () => {
                 </div>
                 <div>
                   <Label className="text-sm text-muted-foreground">Account Type</Label>
-                  <p className="font-medium capitalize">{profile?.user_type || "Unknown"}</p>
+                  <p className="font-medium">{getRoleLabel(userRole)}</p>
                 </div>
                 <Button 
                   variant="outline" 
@@ -374,7 +380,7 @@ const Settings = () => {
                 >
                   Browse Cars
                 </Button>
-                {profile?.user_type === 'car-owner' && (
+                {userRole === 'car-owner' && (
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"

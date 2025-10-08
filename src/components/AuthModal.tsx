@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { User, Shield, Car, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { getPrimaryRole, addUserRole, type AppRole } from "@/lib/roleService";
 
 // ============================================
 // TYPES
@@ -78,29 +79,18 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
         return;
       }
 
-      // Verify user type matches the selected type
+      // Verify user role matches the selected type
       if (authData.user) {
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_type')
-          .eq('user_id', authData.user.id)
-          .single();
-
-        if (profileError) {
+        const primaryRole = await getPrimaryRole(authData.user.id);
+        
+        if (primaryRole !== userType) {
           await supabase.auth.signOut();
+          const getRoleName = (role: string) => 
+            role === 'user' ? 'Customer' : role === 'car-owner' ? 'Car Owner' : 'Admin';
+          
           toast({
             title: "Error",
-            description: "Failed to verify user type",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        if (profile.user_type !== userType) {
-          await supabase.auth.signOut();
-          toast({
-            title: "Error",
-            description: `You cannot login as ${userType === 'user' ? 'Customer' : userType === 'car-owner' ? 'Car Owner' : 'Admin'}. Your account type is ${profile.user_type === 'user' ? 'Customer' : profile.user_type === 'car-owner' ? 'Car Owner' : 'Admin'}.`,
+            description: `You cannot login as ${getRoleName(userType)}. Your account type is ${getRoleName(primaryRole)}.`,
             variant: "destructive"
           });
           return;
@@ -191,31 +181,41 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      // Create auth user first
+      const { data: authData, error: signupError } = await supabase.auth.signUp({
         email: formData.email,
         password: "temp_password", // Will be set via email verification
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: formData.fullName,
-            user_type: userType
+            full_name: formData.fullName
           }
         }
       });
 
-      if (error) {
+      if (signupError) {
         toast({
           title: "Error",
-          description: error.message,
+          description: signupError.message,
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "Check your email",
-          description: "We sent you a verification link to complete your signup"
-        });
-        setCurrentTab("login");
+        return;
       }
+
+      // Add user role (handled by trigger for profile creation)
+      if (authData.user) {
+        // The role will be added after email confirmation
+        // For now, we store it in user metadata
+        await supabase.auth.updateUser({
+          data: { pending_role: userType }
+        });
+      }
+
+      toast({
+        title: "Check your email",
+        description: "We sent you a verification link to complete your signup"
+      });
+      setCurrentTab("login");
     } catch (err) {
       toast({
         title: "Error",

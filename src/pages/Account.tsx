@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { getPrimaryRole, type AppRole } from "@/lib/roleService";
 
 import { 
   User, 
@@ -24,7 +25,6 @@ interface UserProfile {
   user_id: string;
   full_name: string;
   email: string;
-  user_type: string;
   created_at: string;
   updated_at: string;
 }
@@ -32,6 +32,7 @@ interface UserProfile {
 const Account = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [userRole, setUserRole] = useState<AppRole>("user");
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
@@ -77,6 +78,10 @@ const Account = () => {
           email: profileData.email || ""
         });
       }
+
+      // Get user's primary role
+      const primaryRole = await getPrimaryRole(session.user.id);
+      setUserRole(primaryRole);
     } catch (error) {
       console.error('Error checking user:', error);
       toast({
@@ -142,7 +147,7 @@ const Account = () => {
     setEditing(false);
   };
 
-  const getUserTypeColor = (type: string) => {
+  const getUserTypeColor = (type: AppRole) => {
     switch (type) {
       case 'admin':
         return 'bg-red-500/20 text-red-400 border-red-500/30';
@@ -153,7 +158,7 @@ const Account = () => {
     }
   };
 
-  const getUserTypeIcon = (type: string) => {
+  const getUserTypeIcon = (type: AppRole) => {
     switch (type) {
       case 'admin':
         return <Shield className="h-4 w-4" />;
@@ -164,7 +169,7 @@ const Account = () => {
     }
   };
 
-  const getUserTypeName = (type: string) => {
+  const getUserTypeName = (type: AppRole) => {
     switch (type) {
       case 'admin':
         return 'Administrator';
@@ -290,9 +295,9 @@ const Account = () => {
                   <div className="space-y-2">
                     <Label>Account Type</Label>
                     <div className="p-3 rounded-md bg-muted/20">
-                      <Badge className={getUserTypeColor(profile?.user_type || '')}>
-                        {getUserTypeIcon(profile?.user_type || '')}
-                        <span className="ml-2">{getUserTypeName(profile?.user_type || '')}</span>
+                      <Badge className={getUserTypeColor(userRole)}>
+                        {getUserTypeIcon(userRole)}
+                        <span className="ml-2">{getUserTypeName(userRole)}</span>
                       </Badge>
                     </div>
                   </div>
@@ -358,7 +363,7 @@ const Account = () => {
                 </div>
                 <div>
                   <span className="text-muted-foreground text-sm">Account Type</span>
-                  <p className="font-medium">{getUserTypeName(profile?.user_type || '')}</p>
+                  <p className="font-medium">{getUserTypeName(userRole)}</p>
                 </div>
               </CardContent>
             </Card>
@@ -385,7 +390,7 @@ const Account = () => {
                   <Shield className="h-4 w-4 mr-2" />
                   Account Settings
                 </Button>
-                {profile?.user_type === 'car-owner' && (
+                {userRole === 'car-owner' && (
                   <Button 
                     variant="outline" 
                     className="w-full justify-start"

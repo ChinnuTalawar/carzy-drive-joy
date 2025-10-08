@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { getPrimaryRole, type AppRole } from "@/lib/roleService";
 
 import { 
   Calendar, 
@@ -42,7 +43,7 @@ interface Booking {
 
 const BookingHistory = () => {
   const [user, setUser] = useState<any>(null);
-  const [userType, setUserType] = useState<string>("");
+  const [userType, setUserType] = useState<AppRole>("user");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [customerBookings, setCustomerBookings] = useState<Booking[]>([]);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
@@ -64,17 +65,10 @@ const BookingHistory = () => {
 
       setUser(session.user);
 
-      // Get user profile to determine user type
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('user_id', session.user.id)
-        .single();
-
-      if (profile) {
-        setUserType(profile.user_type);
-        await fetchBookings(profile.user_type, session.user.id);
-      }
+      // Get user's primary role
+      const primaryRole = await getPrimaryRole(session.user.id);
+      setUserType(primaryRole);
+      await fetchBookings(primaryRole, session.user.id);
     } catch (error) {
       console.error('Error checking user:', error);
       toast({
@@ -87,7 +81,7 @@ const BookingHistory = () => {
     }
   };
 
-  const fetchBookings = async (type: string, userId: string) => {
+  const fetchBookings = async (type: AppRole, userId: string) => {
     try {
       if (type === 'admin') {
         // Admin sees all bookings - get bookings and join data separately
@@ -114,13 +108,12 @@ const BookingHistory = () => {
           
           setBookings(bookingsWithDetails);
           
-          // Separate customer and owner bookings
-          const customers = await supabase
-            .from('profiles')
-            .select('user_id')
-            .eq('user_type', 'user');
+          // Separate customer and owner bookings by checking user_roles
+          const { data: userRoles } = await supabase
+            .from('user_roles')
+            .select('user_id, role');
           
-          const customerIds = customers.data?.map(p => p.user_id) || [];
+          const customerIds = userRoles?.filter(r => r.role === 'user' && !userRoles.some(ur => ur.user_id === r.user_id && ur.role !== 'user')).map(r => r.user_id) || [];
           
           setCustomerBookings(bookingsWithDetails.filter(b => customerIds.includes(b.user_id)));
           setOwnerBookings(bookingsWithDetails.filter(b => !customerIds.includes(b.user_id)));

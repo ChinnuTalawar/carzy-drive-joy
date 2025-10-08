@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { getPrimaryRole, type AppRole } from "@/lib/roleService";
 
 import { 
   Car, 
@@ -37,7 +38,7 @@ interface RecentBooking {
 
 const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
-  const [userType, setUserType] = useState<string>("");
+  const [userType, setUserType] = useState<AppRole>("user");
   const [stats, setStats] = useState<DashboardStats>({
     totalBookings: 0,
     totalRevenue: 0,
@@ -63,17 +64,10 @@ const Dashboard = () => {
 
       setUser(session.user);
 
-      // Get user profile to determine user type
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('user_id', session.user.id)
-        .single();
-
-      if (profile) {
-        setUserType(profile.user_type);
-        await fetchDashboardData(profile.user_type, session.user.id);
-      }
+      // Get user's primary role from user_roles table
+      const primaryRole = await getPrimaryRole(session.user.id);
+      setUserType(primaryRole);
+      await fetchDashboardData(primaryRole, session.user.id);
     } catch (error) {
       console.error('Error checking user:', error);
       toast({
@@ -86,7 +80,7 @@ const Dashboard = () => {
     }
   };
 
-  const fetchDashboardData = async (type: string, userId: string) => {
+  const fetchDashboardData = async (type: AppRole, userId: string) => {
     try {
       if (type === 'admin') {
         // Admin sees all data

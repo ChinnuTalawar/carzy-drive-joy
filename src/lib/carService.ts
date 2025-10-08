@@ -45,13 +45,15 @@ export const fetchCarDetails = async (carId: string): Promise<CarWithOwnerInfo |
     
     if (user) {
       // Check if user is the car owner, admin, or has a booking for this car
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("user_type")
+      // Check for admin role
+      const { data: adminRole } = await supabase
+        .from("user_roles")
+        .select("role")
         .eq("user_id", user.id)
+        .eq("role", "admin")
         .maybeSingle();
 
-      const isAdmin = profile?.user_type === 'admin';
+      const isAdmin = !!adminRole;
       const isOwner = carData.owner_id === user.id;
       
       // Check if user has a booking for this car
