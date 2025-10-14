@@ -4,9 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users, Fuel, Settings, Calendar, MapPin, Clock, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
-import { fetchPublicCars } from "@/lib/carService";
 import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
 import carSuvImage from "@/assets/car-suv.jpg";
@@ -21,8 +20,14 @@ const Cars = () => {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const data = await fetchPublicCars({ available: true });
-        setCars(data);
+        const { data, error } = await supabase
+          .from("cars")
+          .select("*")
+          .eq("available", true);
+        
+        if (data && !error) {
+          setCars(data);
+        }
       } catch (error) {
         console.error("Error fetching cars:", error);
       } finally {
@@ -176,7 +181,7 @@ const Cars = () => {
   return (
     <div className="min-h-screen">
       <Header />
-      <main className="pt-20">
+      <main className="pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
             Our Fleet
@@ -184,7 +189,7 @@ const Cars = () => {
 
           {/* Category Filter */}
           <div className="mb-8">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Filter by Category</h2>
+            <h2 className="text-lg font-semibold mb-4">Filter by Category</h2>
             <div className="flex flex-wrap gap-2">
               {categories.map((category) => (
                 <Button
@@ -214,10 +219,6 @@ const Cars = () => {
                     src={car.image}
                     alt={car.name}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-smooth"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/placeholder.svg';
-                    }}
                   />
                   <div className="absolute top-3 left-3">
                     <Badge className="gradient-secondary text-secondary-foreground">
@@ -243,7 +244,7 @@ const Cars = () => {
                 {/* Car Details */}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-foreground">{car.name}</h3>
+                    <h3 className="text-lg font-semibold">{car.name}</h3>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">₹{car.price_per_day || car.price}</div>
                         <div className="text-xs text-muted-foreground">per day</div>

@@ -1,6 +1,3 @@
-// ============================================
-// IMPORTS
-// ============================================
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,46 +10,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Shield, Car, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { User, Shield, Car, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { getPrimaryRole, addUserRole, type AppRole } from "@/lib/roleService";
 
-// ============================================
-// TYPES
-// ============================================
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: "login" | "signup" | "forgot";
+  initialTab?: "login" | "signup";
 }
 
 const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) => {
-  // ============================================
-  // STATE
-  // ============================================
-  const { toast } = useToast();
   const [userType, setUserType] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [currentTab, setCurrentTab] = useState(initialTab);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    fullName: "",
-    forgotEmail: ""
+    fullName: ""
   });
+  const { toast } = useToast();
 
-  // ============================================
-  // HELPERS
-  // ============================================
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // ============================================
-  // LOGIN HANDLER
-  // ============================================
   const handleLogin = async () => {
     if (!formData.email || !formData.password || !userType) {
       toast({
@@ -65,36 +47,46 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
-      if (authError) {
+      if (error) {
         toast({
-          title: "Error",
-          description: authError.message,
+          title: "Login Failed",
+          description: error.message,
           variant: "destructive"
         });
         return;
       }
 
-      // Verify user role matches the selected type
-      if (authData.user) {
-        const primaryRole = await getPrimaryRole(authData.user.id);
-        
-        if (primaryRole !== userType) {
-          await supabase.auth.signOut();
-          const getRoleName = (role: string) => 
-            role === 'user' ? 'Customer' : role === 'car-owner' ? 'Car Owner' : 'Admin';
-          
-          toast({
-            title: "Error",
-            description: `You cannot login as ${getRoleName(userType)}. Your account type is ${getRoleName(primaryRole)}.`,
-            variant: "destructive"
-          });
-          return;
-        }
+      // Fetch user profile to validate user type
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('email', formData.email)
+        .single();
+
+      if (profileError || !profile) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Login Failed",
+          description: "User profile not found",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Validate user type matches selected type
+      if (profile.user_type !== userType) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Access Denied",
+          description: `This account is registered as ${profile.user_type}. Please select the correct account type.`,
+          variant: "destructive"
+        });
+        return;
       }
 
       toast({
@@ -105,7 +97,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to login",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
     } finally {
@@ -113,54 +105,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     }
   };
 
-  // ============================================
-  // FORGOT PASSWORD HANDLER
-  // ============================================
-  const handleForgotPassword = async () => {
-    if (!formData.forgotEmail) {
-      toast({
-        title: "Error",
-        description: "Please enter your email address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.forgotEmail, {
-        redirectTo: `${window.location.origin}/reset-password`
-      });
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "If an account with this email exists, a password reset link has been sent"
-        });
-        setCurrentTab("login");
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to send reset link",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ============================================
-  // SIGNUP HANDLER
-  // ============================================
   const handleSignup = async () => {
-    if (!formData.email || !formData.fullName || !userType) {
+    if (!formData.email || !formData.password || !formData.fullName || !userType) {
       toast({
         title: "Error",
         description: "Please fill all fields",
@@ -181,45 +127,37 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      // Create auth user first
-      const { data: authData, error: signupError } = await supabase.auth.signUp({
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
         email: formData.email,
-        password: "temp_password", // Will be set via email verification
+        password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: redirectUrl,
           data: {
-            full_name: formData.fullName
+            full_name: formData.fullName,
+            user_type: userType
           }
         }
       });
 
-      if (signupError) {
+      if (error) {
         toast({
-          title: "Error",
-          description: signupError.message,
+          title: "Signup Failed",
+          description: error.message,
           variant: "destructive"
         });
-        return;
-      }
-
-      // Add user role (handled by trigger for profile creation)
-      if (authData.user) {
-        // The role will be added after email confirmation
-        // For now, we store it in user metadata
-        await supabase.auth.updateUser({
-          data: { pending_role: userType }
+      } else {
+        toast({
+          title: "Success",
+          description: "Account created! Please check your email for verification."
         });
+        onClose();
       }
-
-      toast({
-        title: "Check your email",
-        description: "We sent you a verification link to complete your signup"
-      });
-      setCurrentTab("login");
     } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to create account",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
     } finally {
@@ -227,9 +165,19 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     }
   };
 
-  // ============================================
-  // RENDER
-  // ============================================
+  const getUserTypeIcon = (type: string) => {
+    switch (type) {
+      case "user":
+        return <User className="h-4 w-4" />;
+      case "admin":
+        return <Shield className="h-4 w-4" />;
+      case "car-owner":
+        return <Car className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md gradient-card border-border">
@@ -239,76 +187,67 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           </DialogTitle>
         </DialogHeader>
         
-        <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "login" | "signup" | "forgot")} className="w-full">
-          {currentTab !== "forgot" && (
-            <TabsList className="grid w-full grid-cols-2 gradient-card">
-              <TabsTrigger value="login" className="text-foreground">Login</TabsTrigger>
-              <TabsTrigger value="signup" className="text-foreground">Sign Up</TabsTrigger>
-            </TabsList>
-          )}
+        <Tabs defaultValue={initialTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 gradient-card">
+            <TabsTrigger value="login" className="text-foreground">Login</TabsTrigger>
+            <TabsTrigger value="signup" className="text-foreground">Sign Up</TabsTrigger>
+          </TabsList>
           
-          {/* ========== LOGIN TAB ========== */}
           <TabsContent value="login" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="login-email" className="text-foreground">Email</Label>
+                <Label htmlFor="login-email">Email</Label>
                 <Input
                   id="login-email"
                   type="email"
                   placeholder="Enter your email"
-                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
+                  className="gradient-card border-border"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="login-password" className="text-foreground">Password</Label>
+                <Label htmlFor="login-password">Password</Label>
                 <div className="relative">
                   <Input
                     id="login-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className="gradient-card border-border text-foreground placeholder:text-muted-foreground pr-10"
+                    className="gradient-card border-border pr-12"
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                   />
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
-              
               <div className="space-y-2">
-                <Label htmlFor="login-type" className="text-foreground">Login as</Label>
+                <Label htmlFor="login-type">Login as</Label>
                 <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border text-foreground">
-                    <SelectValue placeholder="Select user type" className="text-foreground" />
+                  <SelectTrigger className="gradient-card border-border">
+                    <SelectValue placeholder="Select user type" />
                   </SelectTrigger>
                   <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user" className="text-foreground">
+                    <SelectItem value="user" className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Customer
                       </div>
                     </SelectItem>
-                    <SelectItem value="car-owner" className="text-foreground">
+                    <SelectItem value="car-owner" className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <Car className="h-4 w-4" />
                         Car Owner
                       </div>
                     </SelectItem>
-                    <SelectItem value="admin" className="text-foreground">
+                    <SelectItem value="admin" className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4" />
                         Admin
@@ -317,70 +256,77 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   </SelectContent>
                 </Select>
               </div>
-              
               <Button 
                 className="w-full gradient-primary hover:shadow-glow hover:scale-105"
                 onClick={handleLogin}
                 disabled={loading}
               >
-                <Lock className="h-4 w-4 mr-2" />
+                {getUserTypeIcon(userType)}
                 {loading ? "Logging in..." : "Login"}
               </Button>
-              
-              <div className="text-center">
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => setCurrentTab("forgot")}
-                  className="text-sm text-muted-foreground"
-                >
-                  Forgot Password?
-                </Button>
-              </div>
             </div>
           </TabsContent>
           
-          {/* ========== SIGNUP TAB ========== */}
           <TabsContent value="signup" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
+                <Label htmlFor="signup-name">Full Name</Label>
                 <Input
                   id="signup-name"
                   type="text"
                   placeholder="Enter your full name"
-                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
+                  className="gradient-card border-border"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange("fullName", e.target.value)}
                 />
               </div>
-              
               <div className="space-y-2">
-                <Label htmlFor="signup-email" className="text-foreground">Email</Label>
+                <Label htmlFor="signup-email">Email</Label>
                 <Input
                   id="signup-email"
                   type="email"
                   placeholder="Enter your email"
-                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
+                  className="gradient-card border-border"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
-              
               <div className="space-y-2">
-                <Label htmlFor="signup-type" className="text-foreground">Sign up as</Label>
+                <Label htmlFor="signup-password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Create a password"
+                    className="gradient-card border-border pr-12"
+                    value={formData.password}
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-type">Sign up as</Label>
                 <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border text-foreground">
-                    <SelectValue placeholder="Select user type" className="text-foreground" />
+                  <SelectTrigger className="gradient-card border-border">
+                    <SelectValue placeholder="Select user type" />
                   </SelectTrigger>
                   <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user" className="text-foreground">
+                    <SelectItem value="user">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         Customer
                       </div>
                     </SelectItem>
-                    <SelectItem value="car-owner" className="text-foreground">
+                    <SelectItem value="car-owner">
                       <div className="flex items-center gap-2">
                         <Car className="h-4 w-4" />
                         Car Owner
@@ -389,55 +335,13 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   </SelectContent>
                 </Select>
               </div>
-              
               <Button 
                 className="w-full gradient-primary hover:shadow-glow hover:scale-105"
                 onClick={handleSignup}
                 disabled={loading}
               >
-                <Mail className="h-4 w-4 mr-2" />
-                {loading ? "Creating Account..." : "Sign Up with Email"}
-              </Button>
-            </div>
-          </TabsContent>
-          
-          {/* ========== FORGOT PASSWORD TAB ========== */}
-          <TabsContent value="forgot" className="space-y-4 mt-6">
-            <div className="space-y-4">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-2 text-foreground">Reset Password</h3>
-                <p className="text-sm text-muted-foreground">
-                  Enter your email to receive a password reset link
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="forgot-email" className="text-foreground">Email</Label>
-                <Input
-                  id="forgot-email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className="gradient-card border-border text-foreground placeholder:text-muted-foreground"
-                  value={formData.forgotEmail}
-                  onChange={(e) => handleInputChange("forgotEmail", e.target.value)}
-                />
-              </div>
-              
-              <Button 
-                className="w-full gradient-primary hover:shadow-glow hover:scale-105"
-                onClick={handleForgotPassword}
-                disabled={loading}
-              >
-                {loading ? "Sending..." : "Send Reset Link"}
-              </Button>
-              
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setCurrentTab("login")}
-                className="w-full"
-              >
-                Back to Login
+                {getUserTypeIcon(userType)}
+                {loading ? "Creating Account..." : "Sign Up"}
               </Button>
             </div>
           </TabsContent>

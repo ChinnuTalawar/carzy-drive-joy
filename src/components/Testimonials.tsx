@@ -34,7 +34,7 @@ const Testimonials = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             What Our{" "}
             <span className="gradient-primary bg-clip-text text-transparent">
               Customers Say
@@ -76,7 +76,7 @@ const Testimonials = () => {
                     {testimonial.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">{testimonial.name}</div>
+                    <div className="font-semibold">{testimonial.name}</div>
                     <div className="text-sm text-muted-foreground">{testimonial.location}</div>
                   </div>
                 </div>

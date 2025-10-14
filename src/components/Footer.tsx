@@ -32,7 +32,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="contact" className="bg-card text-card-foreground border-t border-border">
+    <footer id="contact" className="bg-foreground text-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -44,7 +44,7 @@ const Footer = () => {
               </div>
               <span className="text-2xl font-bold">CARzy</span>
             </div>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
+            <p className="text-background/80 mb-6 leading-relaxed">
               Your trusted partner for premium car rentals. Experience the freedom of the road with our reliable and affordable vehicles.
             </p>
             
@@ -52,28 +52,28 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary" />
-                <span className="text-foreground">+1 (555) 123-4567</span>
+                <span className="text-background/90">+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary" />
-                <span className="text-foreground">hello@carzy.com</span>
+                <span className="text-background/90">hello@carzy.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-primary" />
-                <span className="text-foreground">123 Main St, City, State 12345</span>
+                <span className="text-background/90">123 Main St, City, State 12345</span>
               </div>
             </div>
           </div>
 
           {/* Company Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Company</h3>
+            <h3 className="text-lg font-semibold mb-4">Company</h3>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-smooth"
+                    className="text-background/80 hover:text-primary transition-smooth"
                   >
                     {link.name}
                   </a>
@@ -84,13 +84,13 @@ const Footer = () => {
 
           {/* Services Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Services</h3>
+            <h3 className="text-lg font-semibold mb-4">Services</h3>
             <ul className="space-y-2">
               {footerLinks.services.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-smooth"
+                    className="text-background/80 hover:text-primary transition-smooth"
                   >
                     {link.name}
                   </a>
@@ -101,13 +101,13 @@ const Footer = () => {
 
           {/* Support Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-foreground">Support</h3>
+            <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary transition-smooth"
+                    className="text-background/80 hover:text-primary transition-smooth"
                   >
                     {link.name}
                   </a>
@@ -118,10 +118,10 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-border py-6">
+        <div className="border-t border-background/20 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             {/* Copyright */}
-            <p className="text-muted-foreground text-sm">
+            <p className="text-background/80 text-sm">
               © {currentYear} CARzy. All rights reserved.
             </p>
 
@@ -132,7 +132,7 @@ const Footer = () => {
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="text-muted-foreground hover:text-primary transition-smooth p-2 hover:bg-accent rounded-lg"
+                  className="text-background/80 hover:text-primary transition-smooth p-2 hover:bg-background/10 rounded-lg"
                 >
                   <social.icon className="h-5 w-5" />
                 </a>

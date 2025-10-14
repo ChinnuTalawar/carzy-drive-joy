@@ -33,7 +33,7 @@ const WhyChoose = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Why Choose{" "}
             <span className="gradient-primary bg-clip-text text-transparent">
               CARzy?
@@ -59,7 +59,7 @@ const WhyChoose = () => {
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
@@ -70,23 +70,17 @@ const WhyChoose = () => {
         {/* Bottom CTA */}
         <div className="text-center mt-12">
           <div className="gradient-card p-8 rounded-2xl shadow-medium max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
+            <h3 className="text-2xl font-bold mb-4">
               Ready to Hit the Road?
             </h3>
             <p className="text-muted-foreground mb-6">
               Join thousands of satisfied customers who trust CARzy for their transportation needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => window.location.href = '/cars'}
-                className="gradient-primary text-primary-foreground px-8 py-3 rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-smooth shadow-soft"
-              >
+              <button className="gradient-primary text-primary-foreground px-8 py-3 rounded-xl font-semibold hover:shadow-glow hover:scale-105 transition-smooth shadow-soft">
                 Start Booking
               </button>
-              <button 
-                onClick={() => window.location.href = '/about'}
-                className="border-2 border-primary text-primary px-8 py-3 rounded-xl font-semibold hover:gradient-primary hover:text-primary-foreground hover:scale-105 transition-smooth"
-              >
+              <button className="border-2 border-primary text-primary px-8 py-3 rounded-xl font-semibold hover:gradient-primary hover:text-primary-foreground hover:scale-105 transition-smooth">
                 Learn More
               </button>
             </div>
