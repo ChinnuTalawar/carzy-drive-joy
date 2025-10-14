@@ -1,22 +1,86 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car } from "lucide-react";
+import { Menu, X, Car, ArrowLeft } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
 import SearchModal from "./SearchModal";
 
 const Header = () => {
+  // ============================================
+  // STATE & HOOKS
+  // ============================================
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+  
+  // UI State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  
+  // Auth State
   const [user, setUser] = useState(null);
   const [session, setSession] = useState(null);
+  
+  // Modal State
   const [authModal, setAuthModal] = useState<{
     isOpen: boolean;
     initialTab: "login" | "signup";
   }>({ isOpen: false, initialTab: "login" });
   const [searchModal, setSearchModal] = useState(false);
 
-  // Authentication state management
+  // ============================================
+  // AUTO-HIDE HEADER (for non-home pages)
+  // ============================================
+  useEffect(() => {
+    // Always show header on homepage
+    if (isHomePage) {
+      setIsHeaderVisible(true);
+      return;
+    }
+
+    let timeoutId: NodeJS.Timeout;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Show header when mouse is near the top (within 100px)
+      if (e.clientY <= 100) {
+        setIsHeaderVisible(true);
+        
+        // Clear existing timeout
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        
+        // Hide after 3 seconds of no mouse movement at top
+        timeoutId = setTimeout(() => {
+          if (e.clientY > 100) {
+            setIsHeaderVisible(false);
+          }
+        }, 3000);
+      } else if (e.clientY > 150) {
+        // Hide header when mouse moves away from top
+        setIsHeaderVisible(false);
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    setIsHeaderVisible(false); // Initially hide header on non-home pages
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isHomePage]);
+
+  // ============================================
+  // AUTHENTICATION STATE
+  // ============================================
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -35,13 +99,18 @@ const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // ============================================
+  // NAVIGATION CONFIG
+  // ============================================
   const navItems = [
     { name: "Home", href: "#home" },
     { name: "Cars", href: "#cars" },
-    { name: "Pricing", href: "#pricing" },
     { name: "Contact", href: "#contact" },
   ];
 
+  // ============================================
+  // EVENT HANDLERS
+  // ============================================
   const handleNavClick = (href: string) => {
     if (href === "#cars") {
       window.location.href = "/cars";
@@ -54,19 +123,39 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // ============================================
+  // RENDER
+  // ============================================
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft">
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft transition-transform duration-300 ease-in-out ${
+      isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="gradient-primary p-2 rounded-xl shadow-soft">
-              <Car className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-extrabold gradient-primary bg-clip-text text-transparent tracking-wider">
-              CARzy
-            </span>
-          </div>
+          {/* Logo or Back Button */}
+          {isHomePage ? (
+            <button 
+              onClick={() => navigate("/")} 
+              className="flex items-center space-x-2 hover:opacity-80 transition-smooth"
+            >
+              <div className="gradient-primary p-2 rounded-xl shadow-soft">
+                <Car className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <span className="text-2xl font-extrabold gradient-primary bg-clip-text text-transparent tracking-wider">
+                CARzy
+              </span>
+            </button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(-1)}
+              className="backdrop-blur-sm bg-background/80 border border-border hover:bg-accent"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          )}
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">

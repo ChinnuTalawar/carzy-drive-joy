@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import BackButton from "@/components/BackButton";
 import {
   ArrowLeft,
   Star,
@@ -19,38 +20,17 @@ import {
   Shield,
   Car as CarIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
 import BookingModal from "@/components/BookingModal";
-
-interface Car {
-  id: string;
-  name: string;
-  brand: string;
-  model: string;
-  year: number;
-  price_per_day: number;
-  image: string;
-  rating: number;
-  passengers: number;
-  fuel_type: string;
-  transmission: string;
-  category: string;
-  available: boolean;
-  owner_name: string;
-  owner_phone: string;
-  owner_email: string;
-  location: string;
-  description: string;
-  features: string[];
-}
+import { fetchCarDetails, CarWithOwnerInfo } from "@/lib/carService";
+import { supabase } from "@/integrations/supabase/client";
 
 const CarDetails = () => {
-  const { carId } = useParams();
+  const { carId } = useParams<{ carId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [car, setCar] = useState<Car | null>(null);
+  const [car, setCar] = useState<CarWithOwnerInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [bookingModal, setBookingModal] = useState(false);
   const [user, setUser] = useState(null);
@@ -61,19 +41,15 @@ const CarDetails = () => {
       setUser(session?.user ?? null);
     });
 
-    const fetchCarDetails = async () => {
-      if (!carId) return;
+    const fetchCarDetailsData = async () => {
+      if (!carId) {
+        navigate("/cars");
+        return;
+      }
 
       try {
-        const { data, error } = await supabase
-          .from("cars")
-          .select("*")
-          .eq("id", carId)
-          .single();
-
-        if (error) throw error;
-
-        setCar(data);
+        const carData = await fetchCarDetails(carId);
+        setCar(carData);
       } catch (error) {
         console.error("Error fetching car details:", error);
         toast({
@@ -87,7 +63,7 @@ const CarDetails = () => {
       }
     };
 
-    fetchCarDetails();
+    fetchCarDetailsData();
   }, [carId, navigate, toast]);
 
   const handleBookNow = () => {
@@ -131,7 +107,7 @@ const CarDetails = () => {
         <Header />
         <main className="pt-20 p-6">
           <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-2xl font-bold mb-4">Car not found</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-4">Car not found</h1>
             <Button onClick={() => navigate("/cars")}>Back to Cars</Button>
           </div>
         </main>
@@ -144,16 +120,6 @@ const CarDetails = () => {
       <Header />
       <main className="pt-20 p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <Button
-            variant="outline"
-            onClick={() => navigate(-1)}
-            className="mb-6 gradient-card border-border"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             {/* Car Image */}
             <div className="space-y-4">
@@ -161,6 +127,10 @@ const CarDetails = () => {
                 src={car.image}
                 alt={car.name}
                 className="w-full h-96 object-cover rounded-xl shadow-strong"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/placeholder.svg';
+                }}
               />
             </div>
 
@@ -203,7 +173,7 @@ const CarDetails = () => {
               {/* Car Features */}
               <Card className="gradient-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">Car Features</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Car Features</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Users className="h-4 w-4 text-primary" />
@@ -242,7 +212,7 @@ const CarDetails = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card className="gradient-card border-border">
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Description</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Description</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     {car.description}
                   </p>
@@ -253,7 +223,7 @@ const CarDetails = () => {
               {car.features && car.features.length > 0 && (
                 <Card className="gradient-card border-border">
                   <CardContent className="p-6">
-                    <h3 className="text-xl font-semibold mb-4">Additional Features</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-4">Additional Features</h3>
                     <div className="grid sm:grid-cols-2 gap-3">
                       {car.features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-2">
@@ -270,36 +240,61 @@ const CarDetails = () => {
             {/* Owner Details */}
             <Card className="gradient-card border-border h-fit">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Owner Details</h3>
+                <h3 className="text-xl font-semibold text-foreground mb-4">
+                  {car.owner_name ? "Owner Details" : "Contact Information"}
+                </h3>
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="h-12 w-12 gradient-primary">
-                      <AvatarFallback className="text-primary-foreground font-semibold">
-                        {car.owner_name?.charAt(0) || "O"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold">{car.owner_name}</p>
-                      <p className="text-sm text-muted-foreground">Car Owner</p>
+                  {car.owner_name ? (
+                    <>
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-12 w-12 gradient-primary">
+                          <AvatarFallback className="text-primary-foreground font-semibold">
+                            {car.owner_name?.charAt(0) || "O"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{car.owner_name}</p>
+                          <p className="text-sm text-muted-foreground">Car Owner</p>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="space-y-3">
+                        {car.owner_phone && (
+                          <div className="flex items-center space-x-3">
+                            <Phone className="h-4 w-4 text-primary" />
+                            <span className="text-sm">{car.owner_phone}</span>
+                          </div>
+                        )}
+                        {car.owner_email && (
+                          <div className="flex items-center space-x-3">
+                            <Mail className="h-4 w-4 text-primary" />
+                            <span className="text-sm">{car.owner_email}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center space-x-3">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <span className="text-sm">{car.location}</span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="flex items-center justify-center mb-3">
+                        <Shield className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Owner contact information is private and only shared with confirmed bookings.
+                      </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-3 justify-center">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <span className="text-sm">{car.location}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <Separator />
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.owner_phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.owner_email}</span>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{car.location}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

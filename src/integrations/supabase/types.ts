@@ -61,6 +61,44 @@ export type Database = {
           },
         ]
       }
+      car_owners: {
+        Row: {
+          car_id: string
+          created_at: string
+          id: string
+          owner_email: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          car_id: string
+          created_at?: string
+          id?: string
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          car_id?: string
+          created_at?: string
+          id?: string
+          owner_email?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_owners_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: true
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cars: {
         Row: {
           available: boolean | null
@@ -75,10 +113,7 @@ export type Database = {
           location: string | null
           model: string
           name: string
-          owner_email: string | null
           owner_id: string | null
-          owner_name: string | null
-          owner_phone: string | null
           passengers: number
           price_per_day: number
           rating: number | null
@@ -99,10 +134,7 @@ export type Database = {
           location?: string | null
           model: string
           name: string
-          owner_email?: string | null
           owner_id?: string | null
-          owner_name?: string | null
-          owner_phone?: string | null
           passengers: number
           price_per_day: number
           rating?: number | null
@@ -123,10 +155,7 @@ export type Database = {
           location?: string | null
           model?: string
           name?: string
-          owner_email?: string | null
           owner_id?: string | null
-          owner_name?: string | null
-          owner_phone?: string | null
           passengers?: number
           price_per_day?: number
           rating?: number | null
@@ -136,33 +165,81 @@ export type Database = {
         }
         Relationships: []
       }
+      otp_usage: {
+        Row: {
+          count: number
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+          user_email: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_email: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+          user_email?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          mobile_number: string | null
           updated_at: string
           user_id: string
-          user_type: string | null
         }
         Insert: {
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          mobile_number?: string | null
           updated_at?: string
           user_id: string
-          user_type?: string | null
         }
         Update: {
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          mobile_number?: string | null
           updated_at?: string
           user_id?: string
-          user_type?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -171,10 +248,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_increment_otp_usage: {
+        Args: { user_email_param: string }
+        Returns: boolean
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "car-owner" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -301,6 +388,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "car-owner", "user"],
+    },
   },
 } as const

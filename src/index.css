@@ -8,15 +8,15 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Dark Space Theme - Lighter version */
-    --background: 240 10% 8%; /* Lighter deep space */
-    --foreground: 0 0% 95%; /* Bright white text */
+    /* Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
 
-    --card: 240 10% 12%; /* Lighter card background */
-    --card-foreground: 0 0% 95%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
 
-    --popover: 240 10% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
 
     /* CARzy Space Theme Colors */
     --primary: 260 100% 70%; /* Electric purple */

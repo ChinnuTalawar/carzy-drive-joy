@@ -1,3 +1,6 @@
+// ============================================
+// IMPORTS
+// ============================================
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +35,9 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
+// ============================================
+// TYPES
+// ============================================
 interface BookingModalProps {
   car: any;
   isOpen: boolean;
@@ -39,12 +45,18 @@ interface BookingModalProps {
 }
 
 const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
+  // ============================================
+  // STATE
+  // ============================================
+  const { toast } = useToast();
   const [step, setStep] = useState(1); // 1: User Details, 2: Booking Details, 3: Payment
+  const [loading, setLoading] = useState(false);
+  
+  // Booking Dates
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-
+  
+  // User Form Data
   const [userDetails, setUserDetails] = useState({
     fullName: "",
     phone: "",
@@ -55,6 +67,9 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
     specialRequests: "",
   });
 
+  // ============================================
+  // HELPERS
+  // ============================================
   const calculateTotalAmount = () => {
     if (!startDate || !endDate) return 0;
     const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -65,6 +80,9 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
     setUserDetails(prev => ({ ...prev, [field]: value }));
   };
 
+  // ============================================
+  // NAVIGATION BETWEEN STEPS
+  // ============================================
   const handleNext = () => {
     if (step === 1) {
       // Validate user details
@@ -99,6 +117,9 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
     }
   };
 
+  // ============================================
+  // SUBMIT BOOKING
+  // ============================================
   const handleBooking = async () => {
     setLoading(true);
     try {
@@ -152,8 +173,12 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
     }
   };
 
+  // ============================================
+  // RENDER STEP CONTENT
+  // ============================================
   const renderStepContent = () => {
     switch (step) {
+      // ========== STEP 1: User Details ==========
       case 1:
         return (
           <div className="space-y-4">
@@ -234,6 +259,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
           </div>
         );
 
+      // ========== STEP 2: Booking Dates ==========
       case 2:
         return (
           <div className="space-y-4">
@@ -327,6 +353,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
           </div>
         );
 
+      // ========== STEP 3: Payment & Confirmation ==========
       case 3:
         return (
           <div className="space-y-4">
@@ -401,6 +428,9 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
     }
   };
 
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto gradient-card border-border">
