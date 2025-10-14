@@ -33,22 +33,19 @@ const UserMenu = ({ user, onSearch }: UserMenuProps) => {
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to logout",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Logged out successfully",
-        });
-        navigate("/");
-      }
+      await supabase.auth.signOut({ scope: 'local' });
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+      navigate("/");
     } catch (err) {
       console.error("Logout error:", err);
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
     }
   };
 
