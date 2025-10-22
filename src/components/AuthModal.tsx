@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Shield, Car, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { User, Shield, Car, Eye, EyeOff, Mail, Lock, Chrome } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, addUserRole, type AppRole } from "@/lib/roleService";
@@ -157,6 +157,65 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
   };
 
   // ============================================
+  // GOOGLE OAUTH HANDLER
+  // ============================================
+  const handleGoogleAuth = async () => {
+    if (!userType) {
+      toast({
+        title: "Error",
+        description: "Please select your account type first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Don't allow admin signup via Google
+    if (userType === "admin" && currentTab === "signup") {
+      toast({
+        title: "Error",
+        description: "Admin accounts cannot be created through signup",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Store the selected role in localStorage for after OAuth redirect
+      localStorage.setItem('pending_user_role', userType);
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive"
+        });
+        localStorage.removeItem('pending_user_role');
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to authenticate with Google",
+        variant: "destructive"
+      });
+      localStorage.removeItem('pending_user_role');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ============================================
   // SIGNUP HANDLER
   // ============================================
   const handleSignup = async () => {
@@ -251,6 +310,54 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           <TabsContent value="login" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="login-type" className="text-foreground">Login as</Label>
+                <Select value={userType} onValueChange={setUserType}>
+                  <SelectTrigger className="gradient-card border-border text-foreground">
+                    <SelectValue placeholder="Select user type" className="text-foreground" />
+                  </SelectTrigger>
+                  <SelectContent className="gradient-card border-border">
+                    <SelectItem value="user" className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Customer
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="car-owner" className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Car className="h-4 w-4" />
+                        Car Owner
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="admin" className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4" />
+                        Admin
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button 
+                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                variant="outline"
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-foreground">Email</Label>
                 <Input
                   id="login-email"
@@ -289,36 +396,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="login-type" className="text-foreground">Login as</Label>
-                <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border text-foreground">
-                    <SelectValue placeholder="Select user type" className="text-foreground" />
-                  </SelectTrigger>
-                  <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user" className="text-foreground">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Customer
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="car-owner" className="text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Car className="h-4 w-4" />
-                        Car Owner
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="admin" className="text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4" />
-                        Admin
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button 
+              <Button
                 className="w-full gradient-primary hover:shadow-glow hover:scale-105"
                 onClick={handleLogin}
                 disabled={loading}
@@ -344,6 +422,48 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           <TabsContent value="signup" className="space-y-4 mt-6">
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="signup-type" className="text-foreground">Sign up as</Label>
+                <Select value={userType} onValueChange={setUserType}>
+                  <SelectTrigger className="gradient-card border-border text-foreground">
+                    <SelectValue placeholder="Select user type" className="text-foreground" />
+                  </SelectTrigger>
+                  <SelectContent className="gradient-card border-border">
+                    <SelectItem value="user" className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Customer
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="car-owner" className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Car className="h-4 w-4" />
+                        Car Owner
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <Button 
+                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                variant="outline"
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
                 <Input
                   id="signup-name"
@@ -367,30 +487,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 />
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="signup-type" className="text-foreground">Sign up as</Label>
-                <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger className="gradient-card border-border text-foreground">
-                    <SelectValue placeholder="Select user type" className="text-foreground" />
-                  </SelectTrigger>
-                  <SelectContent className="gradient-card border-border">
-                    <SelectItem value="user" className="text-foreground">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Customer
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="car-owner" className="text-foreground">
-                      <div className="flex items-center gap-2">
-                        <Car className="h-4 w-4" />
-                        Car Owner
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button 
+              <Button
                 className="w-full gradient-primary hover:shadow-glow hover:scale-105"
                 onClick={handleSignup}
                 disabled={loading}

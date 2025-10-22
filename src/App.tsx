@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import OfflinePage from "@/components/OfflinePage";
+import { supabase } from "@/integrations/supabase/client";
+import { addUserRole, type AppRole } from "@/lib/roleService";
 import Index from "./pages/Index";
 import Cars from "./pages/Cars";
 import CarDetails from "./pages/CarDetails";
@@ -22,6 +24,32 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const isOnline = useOnlineStatus();
+
+  useEffect(() => {
+    // Handle OAuth callback and role assignment
+    const handleAuthStateChange = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Check for pending role from Google OAuth
+        const pendingRole = localStorage.getItem('pending_user_role');
+        
+        if (pendingRole) {
+          // Use setTimeout to avoid blocking the auth callback
+          setTimeout(async () => {
+            try {
+              await addUserRole(session.user.id, pendingRole as AppRole);
+              localStorage.removeItem('pending_user_role');
+            } catch (error) {
+              console.error('Failed to assign role after OAuth:', error);
+            }
+          }, 0);
+        }
+      }
+    });
+
+    return () => {
+      handleAuthStateChange.data.subscription.unsubscribe();
+    };
+  }, []);
 
   if (!isOnline) {
     return <OfflinePage />;
