@@ -338,25 +338,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 </Select>
               </div>
 
-              <Button 
-                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
-                onClick={handleGoogleAuth}
-                disabled={loading}
-                variant="outline"
-              >
-                <Chrome className="h-4 w-4 mr-2" />
-                Continue with Google
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="login-email" className="text-foreground">Email</Label>
                 <Input
@@ -404,6 +385,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 <Lock className="h-4 w-4 mr-2" />
                 {loading ? "Logging in..." : "Login"}
               </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                variant="outline"
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Continue with Google
+              </Button>
               
               <div className="text-center">
                 <Button
@@ -444,25 +444,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                 </Select>
               </div>
 
-              <Button 
-                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
-                onClick={handleGoogleAuth}
-                disabled={loading}
-                variant="outline"
-              >
-                <Chrome className="h-4 w-4 mr-2" />
-                Continue with Google
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
                 <Input
@@ -494,6 +475,25 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
               >
                 <Mail className="h-4 w-4 mr-2" />
                 {loading ? "Creating Account..." : "Sign Up with Email"}
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <Button 
+                className="w-full bg-white hover:bg-gray-100 text-gray-900 border border-border"
+                onClick={handleGoogleAuth}
+                disabled={loading}
+                variant="outline"
+              >
+                <Chrome className="h-4 w-4 mr-2" />
+                Continue with Google
               </Button>
             </div>
           </TabsContent>

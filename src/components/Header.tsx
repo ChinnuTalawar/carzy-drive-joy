@@ -3,9 +3,10 @@
 // ============================================
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Car, ArrowLeft } from "lucide-react";
+import { Menu, X, Car, ArrowLeft, Sun, Moon } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "./ThemeProvider";
 import AuthModal from "./AuthModal";
 import UserMenu from "./UserMenu";
 import SearchModal from "./SearchModal";
@@ -17,6 +18,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const { theme, setTheme } = useTheme();
   
   // UI State
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -172,6 +174,18 @@ const Header = () => {
 
           {/* Auth Buttons or User Menu */}
           <div className="hidden md:flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="hover:bg-accent"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             {user ? (
               <UserMenu user={user} onSearch={() => setSearchModal(true)} />
             ) : (
@@ -220,6 +234,23 @@ const Header = () => {
                 </button>
               ))}
               <div className="px-3 py-2 space-y-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="h-5 w-5 mr-2" />
+                      Light Mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-5 w-5 mr-2" />
+                      Dark Mode
+                    </>
+                  )}
+                </Button>
                 {user ? (
                   <div className="flex flex-col space-y-2">
                     <UserMenu user={user} onSearch={() => setSearchModal(true)} />
