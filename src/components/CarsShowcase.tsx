@@ -11,6 +11,7 @@ import carCompactImage from "@/assets/car-compact.jpg";
 import carLuxuryImage from "@/assets/car-luxury.jpg";
 import carSuvImage from "@/assets/car-suv.jpg";
 import carSportsImage from "@/assets/car-sports.jpg";
+import { motion } from "framer-motion";
 
 const CarsShowcase = () => {
   // ============================================
@@ -109,11 +110,17 @@ const CarsShowcase = () => {
 
         {/* ========== Cars Grid ========== */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(cars.length > 0 ? cars : staticCars).map((car) => (
-            <Card 
-              key={car.id} 
-              className="group hover:shadow-strong transition-smooth hover:-translate-y-2 border-0 shadow-soft gradient-card overflow-hidden"
+          {(cars.length > 0 ? cars : staticCars).map((car, index) => (
+            <motion.div
+              key={car.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
             >
+              <Card 
+                className="group hover:shadow-strong transition-smooth hover:-translate-y-2 border-0 shadow-soft glass-strong overflow-hidden h-full"
+              >
               <CardContent className="p-0">
                 {/* --- Car Image --- */}
                 <div className="relative overflow-hidden">
@@ -177,6 +184,7 @@ const CarsShowcase = () => {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
 
