@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, type AppRole } from "@/lib/roleService";
+import jsPDF from "jspdf";
 
 import { 
   Calendar, 
@@ -203,6 +204,102 @@ const BookingHistory = () => {
     }
   };
 
+  const downloadInvoice = (booking: Booking) => {
+    const pdf = new jsPDF();
+    
+    // Header
+    pdf.setFontSize(22);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("CARzy Rental Invoice", 20, 20);
+    
+    // Invoice details
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(`Invoice ID: ${booking.id.substring(0, 8).toUpperCase()}`, 20, 30);
+    pdf.text(`Date: ${new Date(booking.created_at).toLocaleDateString()}`, 20, 35);
+    
+    // Line separator
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(20, 40, 190, 40);
+    
+    // Customer Information
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("Customer Information", 20, 50);
+    pdf.setFontSize(10);
+    pdf.setTextColor(60, 60, 60);
+    
+    const customerName = booking.user_details?.fullName || booking.user?.full_name || "N/A";
+    const customerEmail = booking.user_details?.email || booking.user?.email || "N/A";
+    const customerPhone = booking.user_details?.phone || "N/A";
+    
+    pdf.text(`Name: ${customerName}`, 20, 58);
+    pdf.text(`Email: ${customerEmail}`, 20, 64);
+    pdf.text(`Phone: ${customerPhone}`, 20, 70);
+    
+    // Car Details
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("Vehicle Details", 20, 85);
+    pdf.setFontSize(10);
+    pdf.setTextColor(60, 60, 60);
+    
+    const carName = booking.car?.name || "Unknown Vehicle";
+    const carBrand = booking.car?.brand || "";
+    const carModel = booking.car?.model || "";
+    
+    pdf.text(`Vehicle: ${carName}`, 20, 93);
+    pdf.text(`Brand: ${carBrand}`, 20, 99);
+    pdf.text(`Model: ${carModel}`, 20, 105);
+    
+    // Booking Details
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("Booking Details", 20, 120);
+    pdf.setFontSize(10);
+    pdf.setTextColor(60, 60, 60);
+    
+    const startDate = new Date(booking.start_date).toLocaleDateString();
+    const endDate = new Date(booking.end_date).toLocaleDateString();
+    const days = Math.ceil((new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / (1000 * 60 * 60 * 24));
+    
+    pdf.text(`Start Date: ${startDate}`, 20, 128);
+    pdf.text(`End Date: ${endDate}`, 20, 134);
+    pdf.text(`Duration: ${days} day(s)`, 20, 140);
+    pdf.text(`Status: ${booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}`, 20, 146);
+    
+    // Payment Summary
+    pdf.setFontSize(12);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("Payment Summary", 20, 165);
+    
+    // Box for total amount
+    pdf.setDrawColor(40, 40, 40);
+    pdf.setFillColor(245, 245, 245);
+    pdf.rect(20, 172, 170, 15, 'FD');
+    
+    pdf.setFontSize(14);
+    pdf.setTextColor(40, 40, 40);
+    pdf.text("Total Amount:", 25, 182);
+    pdf.setFontSize(16);
+    pdf.text(`₹${booking.total_amount.toLocaleString()}`, 160, 182, { align: 'right' });
+    
+    // Footer
+    pdf.setFontSize(8);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text("Thank you for choosing CARzy! For support, contact us at support@carzy.com", 20, 270);
+    pdf.text("This is a computer-generated invoice and does not require a signature.", 20, 275);
+    
+    // Save the PDF
+    const fileName = `CARzy-Invoice-${booking.id.substring(0, 8)}.pdf`;
+    pdf.save(fileName);
+    
+    toast({
+      title: "Invoice Downloaded",
+      description: "Your invoice has been downloaded successfully"
+    });
+  };
+
   const BookingCard = ({ booking }: { booking: Booking }) => (
     <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
       <CardContent className="p-6">
@@ -281,7 +378,11 @@ const BookingHistory = () => {
                   <Eye className="h-3 w-3 mr-1" />
                   View Car
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => downloadInvoice(booking)}
+                >
                   <Download className="h-3 w-3 mr-1" />
                   Invoice
                 </Button>
