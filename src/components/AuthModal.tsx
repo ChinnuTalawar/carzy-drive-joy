@@ -40,7 +40,9 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     email: "",
     password: "",
     fullName: "",
-    forgotEmail: ""
+    forgotEmail: "",
+    signupPassword: "",
+    location: "Karnataka"
   });
 
   // ============================================
@@ -219,10 +221,20 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
   // SIGNUP HANDLER
   // ============================================
   const handleSignup = async () => {
-    if (!formData.email || !formData.fullName || !userType) {
+    if (!formData.email || !formData.fullName || !formData.signupPassword || !userType) {
       toast({
         title: "Error",
         description: "Please fill all fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate password strength
+    if (formData.signupPassword.length < 8) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 8 characters long",
         variant: "destructive"
       });
       return;
@@ -243,11 +255,12 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
       // Create auth user first
       const { data: authData, error: signupError } = await supabase.auth.signUp({
         email: formData.email,
-        password: "temp_password", // Will be set via email verification
+        password: formData.signupPassword,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: formData.fullName
+            full_name: formData.fullName,
+            location: formData.location
           }
         }
       });
@@ -466,6 +479,45 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signup-password" className="text-foreground">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password (min 8 characters)"
+                    className="gradient-card border-border text-foreground placeholder:text-muted-foreground pr-10"
+                    value={formData.signupPassword}
+                    onChange={(e) => handleInputChange("signupPassword", e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signup-location" className="text-foreground">Location</Label>
+                <Select value={formData.location} onValueChange={(value) => handleInputChange("location", value)}>
+                  <SelectTrigger className="gradient-card border-border text-foreground">
+                    <SelectValue placeholder="Select location" className="text-foreground" />
+                  </SelectTrigger>
+                  <SelectContent className="gradient-card border-border">
+                    <SelectItem value="Karnataka" className="text-foreground">Karnataka</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <Button

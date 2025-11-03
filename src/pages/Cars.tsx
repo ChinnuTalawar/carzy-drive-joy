@@ -192,7 +192,7 @@ const Cars = () => {
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
-                  className="capitalize gradient-card border-border"
+                  className={`capitalize gradient-card border-border ${selectedCategory === category ? 'text-black dark:text-white' : ''}`}
                 >
                   {category === "all" ? "All Cars" : category}
                 </Button>
