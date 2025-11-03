@@ -17,6 +17,31 @@ import { User, Shield, Car, Eye, EyeOff, Mail, Lock, Chrome } from "lucide-react
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, addUserRole, type AppRole } from "@/lib/roleService";
+import { z } from "zod";
+
+// ============================================
+// VALIDATION SCHEMAS
+// ============================================
+const loginSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  password: z.string().min(1, { message: "Password is required" }),
+  userType: z.enum(["user", "car-owner", "admin"], { message: "Please select account type" })
+});
+
+const signupSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  fullName: z.string().trim().min(1, { message: "Full name is required" }).max(100, { message: "Name must be less than 100 characters" }),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters" })
+    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+  userType: z.enum(["user", "car-owner"], { message: "Please select account type" })
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" })
+});
 
 // ============================================
 // TYPES
@@ -41,8 +66,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     password: "",
     fullName: "",
     forgotEmail: "",
-    signupPassword: "",
-    location: "Karnataka"
+    signupPassword: ""
   });
 
   // ============================================
@@ -56,10 +80,17 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
   // LOGIN HANDLER
   // ============================================
   const handleLogin = async () => {
-    if (!formData.email || !formData.password || !userType) {
+    // Validate input
+    const validation = loginSchema.safeParse({
+      email: formData.email,
+      password: formData.password,
+      userType
+    });
+
+    if (!validation.success) {
       toast({
-        title: "Error",
-        description: "Please fill all fields",
+        title: "Validation Error",
+        description: validation.error.errors[0].message,
         variant: "destructive"
       });
       return;
@@ -68,8 +99,8 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     setLoading(true);
     try {
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
+        email: validation.data.email,
+        password: validation.data.password
       });
 
       if (authError) {
@@ -119,10 +150,15 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
   // FORGOT PASSWORD HANDLER
   // ============================================
   const handleForgotPassword = async () => {
-    if (!formData.forgotEmail) {
+    // Validate input
+    const validation = forgotPasswordSchema.safeParse({
+      email: formData.forgotEmail
+    });
+
+    if (!validation.success) {
       toast({
-        title: "Error",
-        description: "Please enter your email address",
+        title: "Validation Error",
+        description: validation.error.errors[0].message,
         variant: "destructive"
       });
       return;
@@ -130,7 +166,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.forgotEmail, {
+      const { error } = await supabase.auth.resetPasswordForEmail(validation.data.email, {
         redirectTo: `${window.location.origin}/reset-password`
       });
 
@@ -221,20 +257,18 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
   // SIGNUP HANDLER
   // ============================================
   const handleSignup = async () => {
-    if (!formData.email || !formData.fullName || !formData.signupPassword || !userType) {
-      toast({
-        title: "Error",
-        description: "Please fill all fields",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validate input
+    const validation = signupSchema.safeParse({
+      email: formData.email,
+      fullName: formData.fullName,
+      password: formData.signupPassword,
+      userType
+    });
 
-    // Validate password strength
-    if (formData.signupPassword.length < 8) {
+    if (!validation.success) {
       toast({
-        title: "Error",
-        description: "Password must be at least 8 characters long",
+        title: "Validation Error",
+        description: validation.error.errors[0].message,
         variant: "destructive"
       });
       return;
@@ -254,13 +288,12 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     try {
       // Create auth user first
       const { data: authData, error: signupError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.signupPassword,
+        email: validation.data.email,
+        password: validation.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: formData.fullName,
-            location: formData.location
+            full_name: validation.data.fullName
           }
         }
       });
@@ -487,7 +520,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                   <Input
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password (min 8 characters)"
+                    placeholder="Min 8 chars, 1 uppercase, 1 lowercase, 1 number"
                     className="gradient-card border-border text-foreground placeholder:text-muted-foreground pr-10"
                     value={formData.signupPassword}
                     onChange={(e) => handleInputChange("signupPassword", e.target.value)}
@@ -506,18 +539,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
                     )}
                   </Button>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="signup-location" className="text-foreground">Location</Label>
-                <Select value={formData.location} onValueChange={(value) => handleInputChange("location", value)}>
-                  <SelectTrigger className="gradient-card border-border text-foreground">
-                    <SelectValue placeholder="Select location" className="text-foreground" />
-                  </SelectTrigger>
-                  <SelectContent className="gradient-card border-border">
-                    <SelectItem value="Karnataka" className="text-foreground">Karnataka</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
               
               <Button
