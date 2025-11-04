@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, type AppRole } from "@/lib/roleService";
+import BackButton from "@/components/BackButton";
 
 import { 
   Car, 
@@ -266,8 +267,10 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen gradient-card">
       <div className="container mx-auto px-4 py-8 pt-16">
+        <BackButton />
+        
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 mt-4">
           <div>
             <h1 className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-2">
               {getDashboardTitle()}
@@ -372,7 +375,6 @@ const Dashboard = () => {
                       All Bookings
                     </Button>
                     <Button
-                      variant="outline"
                       className="h-20 flex-col gradient-primary"
                       onClick={() => navigate('/admin/reports')}
                     >

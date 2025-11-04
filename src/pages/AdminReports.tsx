@@ -8,7 +8,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { hasRole } from "@/lib/roleService";
 import { Download, FileSpreadsheet, Calendar } from "lucide-react";
 import * as XLSX from "xlsx";
-import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
 
 const AdminReports = () => {
@@ -200,9 +199,10 @@ const AdminReports = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
-        <div className="flex items-center justify-center h-[50vh]">
-          <p className="text-muted-foreground">Loading...</p>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center h-[50vh]">
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
         </div>
       </div>
     );
@@ -212,7 +212,6 @@ const AdminReports = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-4 py-8">
         <BackButton />
         
@@ -283,7 +282,7 @@ const AdminReports = () => {
               <Button 
                 onClick={generateReport} 
                 disabled={generating}
-                className="w-full"
+                className="w-full gradient-primary"
                 size="lg"
               >
                 <Download className="h-4 w-4 mr-2" />
