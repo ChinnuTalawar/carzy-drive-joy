@@ -16,7 +16,8 @@ import {
   BarChart3,
   Settings,
   Plus,
-  Eye
+  Eye,
+  FileSpreadsheet
 } from "lucide-react";
 
 interface DashboardStats {
@@ -369,6 +370,14 @@ const Dashboard = () => {
                     >
                       <Calendar className="h-6 w-6 mb-2" />
                       All Bookings
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="h-20 flex-col gradient-primary"
+                      onClick={() => navigate('/admin/reports')}
+                    >
+                      <FileSpreadsheet className="h-6 w-6 mb-2" />
+                      Download Reports
                     </Button>
                   </>
                 )}

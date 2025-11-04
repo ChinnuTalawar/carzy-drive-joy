@@ -19,6 +19,7 @@ import BookingHistory from "./pages/BookingHistory";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import AdminReports from "./pages/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ const AppContent = () => {
         <Route path="/booking-history" element={<BookingHistory />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
