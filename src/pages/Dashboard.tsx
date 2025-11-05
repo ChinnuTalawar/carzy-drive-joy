@@ -375,7 +375,7 @@ const Dashboard = () => {
                       All Bookings
                     </Button>
                     <Button
-                      className="h-20 flex-col gradient-primary"
+                      className="h-20 flex-col"
                       onClick={() => navigate('/admin/reports')}
                     >
                       <FileSpreadsheet className="h-6 w-6 mb-2" />

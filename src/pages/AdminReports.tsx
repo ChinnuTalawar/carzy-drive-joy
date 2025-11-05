@@ -282,7 +282,7 @@ const AdminReports = () => {
               <Button 
                 onClick={generateReport} 
                 disabled={generating}
-                className="w-full gradient-primary"
+                className="w-full"
                 size="lg"
               >
                 <Download className="h-4 w-4 mr-2" />
