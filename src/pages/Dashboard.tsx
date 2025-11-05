@@ -530,6 +530,7 @@ const Dashboard = () => {
                       All Bookings
                     </Button>
                     <Button
+                      variant="outline"
                       className="h-20 flex-col"
                       onClick={() => navigate('/admin/reports')}
                     >
