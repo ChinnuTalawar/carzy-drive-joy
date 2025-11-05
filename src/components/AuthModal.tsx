@@ -219,8 +219,12 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
 
     setLoading(true);
     try {
-      // Store the selected role in localStorage for after OAuth redirect
-      localStorage.setItem('pending_user_role', userType);
+      // Encode role in OAuth state parameter (more secure than localStorage)
+      const stateData = {
+        role: userType,
+        timestamp: Date.now()
+      };
+      const encodedState = btoa(JSON.stringify(stateData));
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -229,6 +233,7 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
+            state: encodedState
           }
         }
       });
@@ -239,7 +244,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
           description: error.message,
           variant: "destructive"
         });
-        localStorage.removeItem('pending_user_role');
       }
     } catch (err) {
       toast({
@@ -247,7 +251,6 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
         description: "Failed to authenticate with Google",
         variant: "destructive"
       });
-      localStorage.removeItem('pending_user_role');
     } finally {
       setLoading(false);
     }

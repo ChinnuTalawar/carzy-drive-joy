@@ -34,6 +34,20 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { z } from "zod";
+
+// ============================================
+// VALIDATION SCHEMA
+// ============================================
+const bookingDetailsSchema = z.object({
+  fullName: z.string().trim().min(1, { message: "Full name is required" }).max(100, { message: "Name must be less than 100 characters" }),
+  phone: z.string().trim().min(10, { message: "Phone number must be at least 10 digits" }).max(15, { message: "Phone number must be less than 15 digits" }).regex(/^[0-9+\-\s()]+$/, { message: "Invalid phone number format" }),
+  email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
+  drivingLicense: z.string().trim().min(5, { message: "Driving license number is required" }).max(50, { message: "License number must be less than 50 characters" }),
+  address: z.string().trim().max(500, { message: "Address must be less than 500 characters" }).optional(),
+  emergencyContact: z.string().trim().max(15, { message: "Emergency contact must be less than 15 digits" }).regex(/^[0-9+\-\s()]*$/, { message: "Invalid phone number format" }).optional(),
+  specialRequests: z.string().trim().max(500, { message: "Special requests must be less than 500 characters" }).optional()
+});
 
 // ============================================
 // TYPES
@@ -85,11 +99,13 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
   // ============================================
   const handleNext = () => {
     if (step === 1) {
-      // Validate user details
-      if (!userDetails.fullName || !userDetails.phone || !userDetails.email || !userDetails.drivingLicense) {
+      // Validate user details with zod schema
+      const validation = bookingDetailsSchema.safeParse(userDetails);
+      
+      if (!validation.success) {
         toast({
-          title: "Missing Information",
-          description: "Please fill all required fields",
+          title: "Validation Error",
+          description: validation.error.errors[0].message,
           variant: "destructive",
         });
         return;
@@ -123,6 +139,19 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
   const handleBooking = async () => {
     setLoading(true);
     try {
+      // Final validation before submission
+      const validation = bookingDetailsSchema.safeParse(userDetails);
+      
+      if (!validation.success) {
+        toast({
+          title: "Validation Error",
+          description: validation.error.errors[0].message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -141,7 +170,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
         end_date: endDate?.toISOString().split('T')[0],
         total_amount: calculateTotalAmount(),
         status: 'confirmed',
-        user_details: userDetails,
+        user_details: validation.data, // Use validated data
       };
 
       const { error } = await supabase
@@ -162,7 +191,6 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
       window.open(paymentUrl, '_blank');
       
     } catch (error) {
-      console.error("Booking error:", error);
       toast({
         title: "Booking Failed",
         description: "There was an error processing your booking",

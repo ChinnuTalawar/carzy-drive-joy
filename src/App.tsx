@@ -30,19 +30,30 @@ const AppContent = () => {
     // Handle OAuth callback and role assignment
     const handleAuthStateChange = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        // Check for pending role from Google OAuth
-        const pendingRole = localStorage.getItem('pending_user_role');
+        // Extract role from OAuth state parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const stateParam = urlParams.get('state');
         
-        if (pendingRole) {
-          // Use setTimeout to avoid blocking the auth callback
-          setTimeout(async () => {
-            try {
-              await addUserRole(session.user.id, pendingRole as AppRole);
-              localStorage.removeItem('pending_user_role');
-            } catch (error) {
-              console.error('Failed to assign role after OAuth:', error);
+        if (stateParam) {
+          try {
+            const stateData = JSON.parse(atob(stateParam));
+            const pendingRole = stateData.role;
+            
+            if (pendingRole && ['user', 'car-owner'].includes(pendingRole)) {
+              // Use setTimeout to avoid blocking the auth callback
+              setTimeout(async () => {
+                try {
+                  await addUserRole(session.user.id, pendingRole as AppRole);
+                  // Clean up URL after processing
+                  window.history.replaceState({}, document.title, window.location.pathname);
+                } catch (error) {
+                  // Error already logged in roleService
+                }
+              }, 0);
             }
-          }, 0);
+          } catch (error) {
+            // Invalid state parameter, ignore
+          }
         }
       }
     });
