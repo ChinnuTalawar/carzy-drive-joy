@@ -26,6 +26,10 @@ interface DashboardStats {
   totalRevenue: number;
   totalCars: number;
   totalUsers: number;
+  activeBookings?: number;
+  pendingBookings?: number;
+  completedBookings?: number;
+  upcomingBookings?: number;
 }
 
 interface RecentBooking {
@@ -45,7 +49,11 @@ const Dashboard = () => {
     totalBookings: 0,
     totalRevenue: 0,
     totalCars: 0,
-    totalUsers: 0
+    totalUsers: 0,
+    activeBookings: 0,
+    pendingBookings: 0,
+    completedBookings: 0,
+    upcomingBookings: 0
   });
   const [recentBookings, setRecentBookings] = useState<RecentBooking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,12 +99,18 @@ const Dashboard = () => {
         const { data: profiles } = await supabase.from('profiles').select('*');
 
         const totalRevenue = bookings?.reduce((sum, booking) => sum + booking.total_amount, 0) || 0;
+        const activeBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) >= new Date()).length || 0;
+        const pendingBookings = bookings?.filter(b => b.status === 'pending').length || 0;
+        const completedBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) < new Date()).length || 0;
         
         setStats({
           totalBookings: bookings?.length || 0,
           totalRevenue,
           totalCars: cars?.length || 0,
-          totalUsers: profiles?.length || 0
+          totalUsers: profiles?.length || 0,
+          activeBookings,
+          pendingBookings,
+          completedBookings
         });
 
         // Recent bookings with car and user details
@@ -143,12 +157,18 @@ const Dashboard = () => {
           .in('car_id', carIds);
 
         const totalRevenue = bookings?.reduce((sum, booking) => sum + booking.total_amount, 0) || 0;
+        const activeBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) >= new Date()).length || 0;
+        const pendingBookings = bookings?.filter(b => b.status === 'pending').length || 0;
+        const completedBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) < new Date()).length || 0;
 
         setStats({
           totalBookings: bookings?.length || 0,
           totalRevenue,
           totalCars: cars?.length || 0,
-          totalUsers: 0
+          totalUsers: 0,
+          activeBookings,
+          pendingBookings,
+          completedBookings
         });
 
         // Recent bookings for owner's cars
@@ -192,12 +212,18 @@ const Dashboard = () => {
           .eq('user_id', userId);
 
         const totalSpent = bookings?.reduce((sum, booking) => sum + booking.total_amount, 0) || 0;
+        const activeBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) >= new Date()).length || 0;
+        const upcomingBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.start_date) > new Date()).length || 0;
+        const completedBookings = bookings?.filter(b => b.status === 'confirmed' && new Date(b.end_date) < new Date()).length || 0;
 
         setStats({
           totalBookings: bookings?.length || 0,
           totalRevenue: totalSpent,
           totalCars: 0,
-          totalUsers: 0
+          totalUsers: 0,
+          activeBookings,
+          upcomingBookings,
+          completedBookings
         });
 
         if (bookings) {
@@ -308,6 +334,135 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Role-Based Detailed Statistics */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-foreground">
+            {userType === 'admin' ? 'System Overview' : userType === 'car-owner' ? 'Business Insights' : 'Your Activity'}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {userType === 'admin' && (
+              <>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Active Bookings
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.activeBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Currently ongoing rentals</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Pending Approvals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.pendingBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Awaiting confirmation</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Completed
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.completedBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Total finished rentals</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+            {userType === 'car-owner' && (
+              <>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Car className="h-4 w-4" />
+                      Active Rentals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.activeBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Cars currently rented</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Pending Requests
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.pendingBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Bookings to review</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Completed Trips
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.completedBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Successfully finished</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+            {userType === 'user' && (
+              <>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Car className="h-4 w-4" />
+                      Active Rentals
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.activeBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Currently rented cars</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Upcoming Trips
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.upcomingBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Future bookings</p>
+                  </CardContent>
+                </Card>
+                <Card className="gradient-card border-border hover:shadow-glow transition-smooth">
+                  <CardHeader>
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Completed Trips
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold text-foreground">{stats.completedBookings}</div>
+                    <p className="text-xs text-muted-foreground mt-1">Total trips taken</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Recent Activity */}
