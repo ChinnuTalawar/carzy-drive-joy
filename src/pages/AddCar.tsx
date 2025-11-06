@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import BackButton from "@/components/BackButton";
-import { Car, Upload, Plus, X } from "lucide-react";
+import { Car, Upload, Plus, User, Phone, Mail } from "lucide-react";
 
 const carSchema = z.object({
   name: z.string().min(1, "Car name is required").max(100, "Name too long"),
@@ -29,6 +29,9 @@ const carSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description too long"),
   image: z.string().url("Must be a valid image URL"),
   features: z.array(z.string()).min(1, "Select at least one feature"),
+  owner_name: z.string().min(1, "Your name is required").max(100, "Name too long"),
+  owner_phone: z.string().min(10, "Phone must be at least 10 digits").max(15, "Phone number too long"),
+  owner_email: z.string().email("Invalid email address").max(255, "Email too long"),
 });
 
 type CarFormData = z.infer<typeof carSchema>;
@@ -93,29 +96,46 @@ const AddCar = () => {
         return;
       }
 
-      const { error } = await supabase.from("cars").insert({
-        name: data.name,
-        brand: data.brand,
-        model: data.model,
-        year: data.year,
-        price_per_day: data.price_per_day,
-        passengers: data.passengers,
-        fuel_type: data.fuel_type,
-        transmission: data.transmission,
-        category: data.category,
-        location: data.location,
-        description: data.description,
-        image: data.image,
-        features: data.features,
-        owner_id: session.user.id,
-        available: true,
-      });
+      // Insert car details
+      const { data: carData, error: carError } = await supabase
+        .from("cars")
+        .insert({
+          name: data.name,
+          brand: data.brand,
+          model: data.model,
+          year: data.year,
+          price_per_day: data.price_per_day,
+          passengers: data.passengers,
+          fuel_type: data.fuel_type,
+          transmission: data.transmission,
+          category: data.category,
+          location: data.location,
+          description: data.description,
+          image: data.image,
+          features: data.features,
+          owner_id: session.user.id,
+          available: true,
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (carError) throw carError;
+
+      // Insert owner contact information
+      const { error: ownerError } = await supabase
+        .from("car_owners")
+        .insert({
+          car_id: carData.id,
+          owner_name: data.owner_name,
+          owner_phone: data.owner_phone,
+          owner_email: data.owner_email,
+        });
+
+      if (ownerError) throw ownerError;
 
       toast({
         title: "Success!",
-        description: "Your car has been added successfully",
+        description: "Your car has been added successfully with contact details",
       });
 
       navigate("/dashboard");
@@ -366,6 +386,70 @@ const AddCar = () => {
                   </div>
                   {errors.features && (
                     <p className="text-sm text-destructive">{errors.features.message}</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Owner Contact Information */}
+            <Card className="gradient-card border-border shadow-soft mt-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Your Contact Information
+                </CardTitle>
+                <CardDescription>
+                  Customers will use this to contact you about bookings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Owner Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="owner_name" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Your Name *
+                  </Label>
+                  <Input
+                    id="owner_name"
+                    placeholder="e.g., John Doe"
+                    {...register("owner_name")}
+                  />
+                  {errors.owner_name && (
+                    <p className="text-sm text-destructive">{errors.owner_name.message}</p>
+                  )}
+                </div>
+
+                {/* Owner Phone */}
+                <div className="space-y-2">
+                  <Label htmlFor="owner_phone" className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Phone Number *
+                  </Label>
+                  <Input
+                    id="owner_phone"
+                    type="tel"
+                    placeholder="e.g., +91 9876543210"
+                    {...register("owner_phone")}
+                  />
+                  {errors.owner_phone && (
+                    <p className="text-sm text-destructive">{errors.owner_phone.message}</p>
+                  )}
+                </div>
+
+                {/* Owner Email */}
+                <div className="space-y-2">
+                  <Label htmlFor="owner_email" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email Address *
+                  </Label>
+                  <Input
+                    id="owner_email"
+                    type="email"
+                    placeholder="e.g., john@example.com"
+                    {...register("owner_email")}
+                  />
+                  {errors.owner_email && (
+                    <p className="text-sm text-destructive">{errors.owner_email.message}</p>
                   )}
                 </div>
 
