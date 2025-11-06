@@ -290,13 +290,14 @@ const AuthModal = ({ isOpen, onClose, initialTab = "login" }: AuthModalProps) =>
     setLoading(true);
     try {
       // Create auth user first
-      const { data: authData, error: signupError } = await supabase.auth.signUp({
+const { data: authData, error: signupError } = await supabase.auth.signUp({
         email: validation.data.email,
         password: validation.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            full_name: validation.data.fullName
+            full_name: validation.data.fullName,
+            pending_role: validation.data.userType
           }
         }
       });

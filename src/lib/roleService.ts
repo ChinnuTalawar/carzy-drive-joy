@@ -62,14 +62,16 @@ export const getPrimaryRole = async (userId: string): Promise<AppRole> => {
 /**
  * Add a role to a user (admin only operation via RLS)
  */
-export const addUserRole = async (userId: string, role: AppRole): Promise<boolean> => {
+export const addUserRole = async (_userId: string, role: AppRole): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from("user_roles")
-      .insert({ user_id: userId, role });
+    // Call secure edge function to assign roles using service role on the server.
+    // The edge function derives the user_id from the JWT; _userId is ignored for security.
+    const { data, error } = await supabase.functions.invoke('assign-role', {
+      body: { role },
+    });
 
     if (error) throw error;
-    return true;
+    return !!data?.success;
   } catch (error) {
     console.error("Error adding user role:", error);
     return false;
