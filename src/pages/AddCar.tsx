@@ -27,7 +27,6 @@ const carSchema = z.object({
   category: z.string().min(1, "Category is required"),
   location: z.string().min(1, "Location is required").max(200, "Location too long"),
   description: z.string().min(10, "Description must be at least 10 characters").max(1000, "Description too long"),
-  image: z.string().url("Must be a valid image URL"),
   features: z.array(z.string()).min(1, "Select at least one feature"),
   owner_name: z.string().min(1, "Your name is required").max(100, "Name too long"),
   owner_phone: z.string().min(10, "Phone must be at least 10 digits").max(15, "Phone number too long"),
@@ -59,6 +58,8 @@ const AddCar = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const {
     register,
@@ -82,7 +83,46 @@ const AddCar = () => {
     setValue("features", updated);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("car-images")
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("car-images")
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
   const onSubmit = async (data: CarFormData) => {
+    if (!imageFile) {
+      toast({
+        title: "Error",
+        description: "Please upload a car image",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -95,6 +135,9 @@ const AddCar = () => {
         navigate("/");
         return;
       }
+
+      // Upload image first
+      const imageUrl = await uploadImage(imageFile);
 
       // Insert car details
       const { data: carData, error: carError } = await supabase
@@ -111,7 +154,7 @@ const AddCar = () => {
           category: data.category,
           location: data.location,
           description: data.description,
-          image: data.image,
+          image: imageUrl,
           features: data.features,
           owner_id: session.user.id,
           available: true,
@@ -329,25 +372,30 @@ const AddCar = () => {
                   )}
                 </div>
 
-                {/* Image URL */}
+                {/* Image Upload */}
                 <div className="space-y-2">
-                  <Label htmlFor="image">Image URL *</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="image"
-                      placeholder="https://example.com/car-image.jpg"
-                      {...register("image")}
-                    />
-                    <Button type="button" variant="outline" size="icon">
-                      <Upload className="h-4 w-4" />
-                    </Button>
+                  <Label htmlFor="image">Car Image *</Label>
+                  <div className="flex items-center gap-4">
+                    {imagePreview && (
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg shadow-soft"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <Input
+                        id="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="cursor-pointer"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Upload a high-quality image of your car
+                      </p>
+                    </div>
                   </div>
-                  {errors.image && (
-                    <p className="text-sm text-destructive">{errors.image.message}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Provide a direct URL to your car's image
-                  </p>
                 </div>
 
                 {/* Description */}
