@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, type AppRole } from "@/lib/roleService";
 import jsPDF from "jspdf";
+import { formatIndianDate } from "@/lib/utils";
 
 import { 
   Calendar, 
@@ -216,7 +217,7 @@ const BookingHistory = () => {
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
     pdf.text(`Invoice ID: ${booking.id.substring(0, 8).toUpperCase()}`, 20, 30);
-    pdf.text(`Date: ${new Date(booking.created_at).toLocaleDateString()}`, 20, 35);
+    pdf.text(`Date: ${formatIndianDate(booking.created_at)}`, 20, 35);
     
     // Line separator
     pdf.setDrawColor(200, 200, 200);
@@ -259,8 +260,8 @@ const BookingHistory = () => {
     pdf.setFontSize(10);
     pdf.setTextColor(60, 60, 60);
     
-    const startDate = new Date(booking.start_date).toLocaleDateString();
-    const endDate = new Date(booking.end_date).toLocaleDateString();
+    const startDate = formatIndianDate(booking.start_date);
+    const endDate = formatIndianDate(booking.end_date);
     const days = Math.ceil((new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / (1000 * 60 * 60 * 24));
     
     pdf.text(`Start Date: ${startDate}`, 20, 128);
@@ -343,7 +344,7 @@ const BookingHistory = () => {
                 <div>
                   <p className="font-medium">Start Date</p>
                   <p className="text-muted-foreground">
-                    {new Date(booking.start_date).toLocaleDateString()}
+                    {formatIndianDate(booking.start_date)}
                   </p>
                 </div>
               </div>
@@ -352,7 +353,7 @@ const BookingHistory = () => {
                 <div>
                   <p className="font-medium">End Date</p>
                   <p className="text-muted-foreground">
-                    {new Date(booking.end_date).toLocaleDateString()}
+                    {formatIndianDate(booking.end_date)}
                   </p>
                 </div>
               </div>
@@ -367,7 +368,7 @@ const BookingHistory = () => {
 
             <div className="flex justify-between items-center pt-2">
               <p className="text-xs text-muted-foreground">
-                Booked on {new Date(booking.created_at).toLocaleDateString()}
+                Booked on {formatIndianDate(booking.created_at)}
               </p>
               <div className="flex gap-2">
                 <Button 

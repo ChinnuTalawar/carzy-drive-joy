@@ -9,6 +9,7 @@ import { hasRole } from "@/lib/roleService";
 import { Download, FileSpreadsheet, Calendar } from "lucide-react";
 import * as XLSX from "xlsx";
 import BackButton from "@/components/BackButton";
+import { formatIndianDate } from "@/lib/utils";
 
 const AdminReports = () => {
   const navigate = useNavigate();
@@ -111,7 +112,7 @@ const AdminReports = () => {
 
         return {
           "Booking ID": booking.id.substring(0, 8).toUpperCase(),
-          "Booking Date": new Date(booking.created_at).toLocaleDateString(),
+          "Booking Date": formatIndianDate(booking.created_at),
           "Status": booking.status.toUpperCase(),
           
           "Customer Name": booking.user?.full_name || "N/A",
@@ -127,8 +128,8 @@ const AdminReports = () => {
           "Owner Email": booking.car_owner?.owner_email || "N/A",
           "Owner Phone": booking.car_owner?.owner_phone || "N/A",
           
-          "Start Date": new Date(booking.start_date).toLocaleDateString(),
-          "End Date": new Date(booking.end_date).toLocaleDateString(),
+          "Start Date": formatIndianDate(booking.start_date),
+          "End Date": formatIndianDate(booking.end_date),
           "Duration (Days)": Math.ceil(
             (new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / 
             (1000 * 60 * 60 * 24)

@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, type AppRole } from "@/lib/roleService";
 import BackButton from "@/components/BackButton";
+import { formatIndianDate } from "@/lib/utils";
 
 import { 
   Car, 
@@ -486,7 +487,7 @@ const Dashboard = () => {
                           {userType !== 'user' ? booking.user_email : 'Your booking'}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(booking.start_date).toLocaleDateString()} - {new Date(booking.end_date).toLocaleDateString()}
+                          {formatIndianDate(booking.start_date)} - {formatIndianDate(booking.end_date)}
                         </p>
                       </div>
                       <div className="text-right">

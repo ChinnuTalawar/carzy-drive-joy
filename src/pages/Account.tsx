@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { getPrimaryRole, type AppRole } from "@/lib/roleService";
+import { formatIndianDate } from "@/lib/utils";
 
 import { 
   User, 
@@ -326,7 +327,7 @@ const Account = () => {
                   <span className="text-muted-foreground">Member Since</span>
                   <span className="font-medium">
                     {profile?.created_at 
-                      ? new Date(profile.created_at).toLocaleDateString()
+                      ? formatIndianDate(profile.created_at)
                       : "Unknown"
                     }
                   </span>
@@ -335,7 +336,7 @@ const Account = () => {
                   <span className="text-muted-foreground">Last Updated</span>
                   <span className="font-medium">
                     {profile?.updated_at 
-                      ? new Date(profile.updated_at).toLocaleDateString()
+                      ? formatIndianDate(profile.updated_at)
                       : "Never"
                     }
                   </span>

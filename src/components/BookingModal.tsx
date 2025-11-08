@@ -22,7 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn, formatIndianDate } from "@/lib/utils";
 import {
   CalendarIcon,
   CreditCard,
@@ -305,7 +305,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : <span>Pick start date</span>}
+                      {startDate ? formatIndianDate(startDate) : <span>Pick start date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -332,7 +332,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : <span>Pick end date</span>}
+                      {endDate ? formatIndianDate(endDate) : <span>Pick end date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -434,7 +434,7 @@ const BookingModal = ({ car, isOpen, onClose }: BookingModalProps) => {
                       <div className="flex items-center space-x-2">
                         <CalendarIcon className="h-4 w-4 text-primary" />
                         <span className="text-sm">
-                          {format(startDate, "PPP")} - {format(endDate, "PPP")}
+                          {formatIndianDate(startDate)} - {formatIndianDate(endDate)}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
